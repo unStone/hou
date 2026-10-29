@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>厚 · 品牌物料</title>
+<link rel="icon" href="web/favicon-32x32.png">
+<style>
+  @font-face { font-family: "Source Han Serif SC"; src: url("../fonts/SourceHanSerifCN-Regular.otf") format("opentype"); font-weight: 400; }
+  @font-face { font-family: "Source Han Serif SC"; src: url("../fonts/SourceHanSerifCN-Bold.otf") format("opentype"); font-weight: 600 700; }
+  :root {
+    --paper: #F3EADB; --raised: #F8F2E7; --ink: #333435; --ink-mid: #5F5E5C; --ink-faint: #C9C2B7;
+    --night: #1E2022; --night-raised: #2A2C2E;
+    --serif: "Source Han Serif SC", "Songti SC", serif; --sans: "PingFang SC", -apple-system, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.7 var(--sans); }
+  main { max-width: 1120px; margin: 0 auto; padding: 48px 16px 96px; }
+  header { display: flex; align-items: center; gap: 24px; margin-bottom: 48px; }
+  header img { height: 96px; }
+  h1 { font: 600 40px/1.25 var(--serif); margin: 0; letter-spacing: 0.02em; }
+  header p { margin: 4px 0 0; color: var(--ink-mid); }
+  section { margin-top: 48px; }
+  h2 { font: 600 20px/1.4 var(--serif); margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--ink-faint); }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  figure { margin: 0; background: var(--raised); border-radius: 12px; padding: 16px; }
+  figure.dark { background: var(--night-raised); color: #EDE5D6; }
+  figure.dark figcaption span { color: #C9C2B7; }
+  .frame { display: flex; align-items: center; justify-content: center; min-height: 180px; }
+  .frame img { max-width: 100%; max-height: 260px; display: block; }
+  .frame.checker { background: repeating-conic-gradient(#E7DFD1 0 25%, #F3EADB 0 50%) 0 0 / 16px 16px; border-radius: 8px; }
+  figure.dark .frame.checker { background: repeating-conic-gradient(#2F3133 0 25%, #1E2022 0 50%) 0 0 / 16px 16px; }
+  .masked img { border-radius: 22.37%; }
+  figcaption { margin-top: 12px; font-size: 13px; }
+  figcaption strong { display: block; font-weight: 500; }
+  figcaption span { color: var(--ink-mid); font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; word-break: break-all; }
+  .sizes { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+  .sizes div { text-align: center; font-size: 12px; color: var(--ink-mid); }
+  .sizes img { display: block; margin: 0 auto 6px; border-radius: 22.37%; }
+  .docs a { color: var(--ink); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+  .swatch { border-radius: 8px; overflow: hidden; background: var(--raised); font-size: 12px; }
+  .swatch div { height: 64px; }
+  .swatch p { margin: 0; padding: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="mark/hou-mark-ink.png" alt="厚的山形标志">
+    <div>
+      <h1>厚</h1>
+      <p>读厚，再读薄 · 品牌物料总览</p>
+    </div>
+  </header>
+
+  <section>
+    <h2>应用图标</h2>
+    <div class="grid">
+      <figure><div class="frame masked"><img src="icon/hou-icon-master.png" alt=""></div><figcaption><strong>浅色母版</strong><span>icon/hou-icon-master.png</span></figcaption></figure>
+      <figure class="dark"><div class="frame masked"><img src="icon/hou-icon-master-dark.png" alt=""></div><figcaption><strong>深色模式母版</strong><span>icon/hou-icon-master-dark.png</span></figcaption></figure>
+      <figure><div class="frame checker"><img src="icon/layers/foreground-ink.png" alt=""></div><figcaption><strong>Icon Composer 前景层</strong><span>icon/layers/foreground-ink.png</span></figcaption></figure>
+    </div>
+    <figure style="margin-top:16px">
+      <div class="sizes">
+        <div><img src="macos/AppIcon.appiconset/Icon-mac-512@1x.png" width="128" height="128" alt="">128</div>
+        <div><img src="macos/AppIcon.appiconset/Icon-mac-128@1x.png" width="64" height="64" alt="">64</div>
+        <div><img src="macos/AppIcon.appiconset/Icon-mac-32@2x.png" width="32" height="32" alt="">32</div>
+        <div><img src="macos/AppIcon.appiconset/Icon-mac-16@1x.png" width="16" height="16" alt="">16</div>
+      </div>
+      <figcaption><strong>macOS 各尺寸（加圆角预览）</strong><span>macos/AppIcon.appiconset · macos/Hou.icns</span></figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>标志与横版组合</h2>
+    <div class="grid">
+      <figure><div class="frame checker"><img src="mark/hou-mark-ink.png" alt=""></div><figcaption><strong>墨色标志</strong><span>mark/hou-mark-ink.png</span></figcaption></figure>
+      <figure class="dark"><div class="frame checker"><img src="mark/hou-mark-white.png" alt=""></div><figcaption><strong>白色标志</strong><span>mark/hou-mark-white.png</span></figcaption></figure>
+    </div>
+    <div class="grid wide" style="margin-top:16px">
+      <figure><div class="frame"><img src="lockup/hou-lockup-ink.png" alt=""></div><figcaption><strong>横版组合</strong><span>lockup/hou-lockup-ink.png</span></figcaption></figure>
+      <figure class="dark"><div class="frame"><img src="lockup/hou-lockup-white.png" alt=""></div><figcaption><strong>横版组合（深色）</strong><span>lockup/hou-lockup-white.png</span></figcaption></figure>
+      <figure><div class="frame"><img src="lockup/hou-lockup-tagline-ink.png" alt=""></div><figcaption><strong>横版组合加标语</strong><span>lockup/hou-lockup-tagline-ink.png</span></figcaption></figure>
+      <figure class="dark"><div class="frame"><img src="lockup/hou-lockup-tagline-white.png" alt=""></div><figcaption><strong>横版组合加标语（深色）</strong><span>lockup/hou-lockup-tagline-white.png</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>自媒体</h2>
+    <div class="grid">
+      <figure><div class="frame"><img src="social/avatar-400.png" style="border-radius:50%;max-height:200px" alt=""></div><figcaption><strong>头像（圆形裁切预览）</strong><span>social/avatar-1024.png · avatar-400.png</span></figcaption></figure>
+      <figure class="dark"><div class="frame"><img src="social/avatar-dark-1024.png" style="border-radius:50%;max-height:200px" alt=""></div><figcaption><strong>深色头像</strong><span>social/avatar-dark-1024.png</span></figcaption></figure>
+      <figure><div class="frame"><img src="social/wechat-cover-square-500.png" style="max-height:200px" alt=""></div><figcaption><strong>公众号次条封面</strong><span>social/wechat-cover-square-500.png</span></figcaption></figure>
+      <figure><div class="frame"><img src="social/xiaohongshu-cover-1080x1440.png" style="max-height:300px" alt=""></div><figcaption><strong>小红书封面 3:4</strong><span>social/xiaohongshu-cover-1080x1440.png</span></figcaption></figure>
+    </div>
+    <div class="grid wide" style="margin-top:16px">
+      <figure><div class="frame"><img src="social/wechat-cover-900x383.png" alt=""></div><figcaption><strong>公众号首条封面 2.35:1</strong><span>social/wechat-cover-900x383.png</span></figcaption></figure>
+      <figure><div class="frame"><img src="social/x-header-1500x500.png" alt=""></div><figcaption><strong>X 头图 3:1</strong><span>social/x-header-1500x500.png</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>网站</h2>
+    <div class="grid wide">
+      <figure><div class="frame"><img src="web/og-image.png" alt=""></div><figcaption><strong>分享图 1200×630</strong><span>web/og-image.png</span></figcaption></figure>
+      <figure>
+        <div class="frame"><div class="sizes">
+          <div><img src="web/android-chrome-192x192.png" width="96" height="96" alt="">PWA 192</div>
+          <div><img src="web/apple-touch-icon.png" width="60" height="60" alt="">Apple 180</div>
+          <div><img src="web/favicon-32x32.png" width="32" height="32" alt="">32</div>
+          <div><img src="web/favicon-16x16.png" width="16" height="16" alt="">16</div>
+        </div></div>
+        <figcaption><strong>网页标签图标与 PWA 图标</strong><span>web/ · head-tags.html</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>品牌规范板</h2>
+    <figure><div class="frame"><img src="board/hou-brand-board.png" style="max-height:none" alt=""></div><figcaption><strong>品牌规范板 2560×1440</strong><span>board/hou-brand-board.png</span></figcaption></figure>
+  </section>
+
+  <section>
+    <h2>配色</h2>
+    <div class="swatches">
+      <div class="swatch"><div style="background:#F3EADB;border-bottom:1px solid #C9C2B7"></div><p>宣纸 #F3EADB</p></div>
+      <div class="swatch"><div style="background:#333435"></div><p>墨 #333435</p></div>
+      <div class="swatch"><div style="background:#5F5E5C"></div><p>中墨 #5F5E5C</p></div>
+      <div class="swatch"><div style="background:#A49F97"></div><p>淡墨 #A49F97</p></div>
+      <div class="swatch"><div style="background:#C9C2B7"></div><p>浅墨 #C9C2B7</p></div>
+      <div class="swatch"><div style="background:#1E2022"></div><p>夜墨 #1E2022</p></div>
+      <div class="swatch"><div style="background:#C8452D"></div><p>朱砂 #C8452D</p></div>
+      <div class="swatch"><div style="background:#B83F29"></div><p>深朱砂 #B83F29</p></div>
+      <div class="swatch"><div style="background:#4E6B58"></div><p>已掌握 #4E6B58</p></div>
+      <div class="swatch"><div style="background:#8A5F27"></div><p>部分掌握 #8A5F27</p></div>
+    </div>
+  </section>
+
+  <section class="docs">
+    <h2>规范文档</h2>
+    <p><a href="brand-guidelines.md">brand-guidelines.md</a>：品牌规范与全部物料清单<br>
+    <a href="../DESIGN.md">DESIGN.md</a>：给 AI 编码工具和 Open Design 读取的视觉规范</p>
+  </section>
+</main>
+</body>
+</html>

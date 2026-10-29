@@ -1,0 +1,102 @@
+/* design-systems/hou/tokens.css
+ * Structured token bindings for 《厚》 (Hou).
+ * Xuan rice paper and layered ink wash: calm, restrained, literary. Values mirror DESIGN.md.
+ */
+
+@font-face {
+  font-family: "Source Han Serif SC";
+  src: url("fonts/SourceHanSerifCN-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Han Serif SC";
+  src: url("fonts/SourceHanSerifCN-Bold.otf") format("opentype");
+  font-weight: 600 700;
+  font-display: swap;
+}
+
+:root {
+  --bg: #f3eadb;
+  --surface: #f8f2e7;
+  --surface-warm: var(--surface);
+  --fg: #333435;
+  --fg-2: #5f5e5c;
+  --muted: #5f5e5c;
+  --meta: #a49f97;
+  --border: #c9c2b7;
+  --border-soft: color-mix(in oklab, var(--border), var(--bg) 45%);
+  --accent: #333435;
+  --accent-on: #f3eadb;
+  --accent-hover: #5f5e5c;
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --success: #4e6b58;
+  --warn: #8a5f27;
+  --danger: #b83f29;
+  --seal: #c8452d;
+  --font-display: "Source Han Serif SC", "Source Han Serif CN", "Songti SC", serif;
+  --font-body: "PingFang SC", -apple-system, system-ui, sans-serif;
+  --font-reading: "Source Han Serif SC", "Source Han Serif CN", "Songti SC", serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+  --text-3xl: 40px;
+  --text-4xl: 56px;
+  --leading-body: 1.7;
+  --leading-reading: 1.9;
+  --leading-tight: 1.25;
+  --tracking-display: 0.02em;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --section-y-desktop: 96px;
+  --section-y-tablet: 68px;
+  --section-y-phone: 48px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --elev-flat: none;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-raised: 0 0 0 1px var(--border-soft);
+  --focus-ring: 0 0 0 3px rgba(51, 52, 53, 0.18);
+  --motion-fast: 160ms;
+  --motion-base: 240ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --container-max: 1120px;
+  --container-app: 720px;
+  --container-gutter-desktop: 32px;
+  --container-gutter-tablet: 24px;
+  --container-gutter-phone: 16px;
+}
+
+[data-theme="dark"] {
+  --bg: #1e2022;
+  --surface: #2a2c2e;
+  --fg: #ede5d6;
+  --fg-2: #c9c2b7;
+  --muted: #c9c2b7;
+  --meta: #8a857e;
+  --border: #45474a;
+  --accent: #ede5d6;
+  --accent-on: #1e2022;
+  --accent-hover: #c9c2b7;
+  --focus-ring: 0 0 0 3px rgba(237, 229, 214, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-base: 1ms;
+  }
+}

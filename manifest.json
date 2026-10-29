@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "od-design-system-project/v1",
+  "id": "hou",
+  "name": "Hou 厚",
+  "category": "Themed & Unique",
+  "description": "Xuan rice paper and layered ink wash for the macOS reading companion Hou: calm, restrained, literary.",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/unStone/hou"
+  },
+  "files": {
+    "design": "DESIGN.md",
+    "tokens": "tokens.css"
+  },
+  "usage": "USAGE.md",
+  "craft": {
+    "applies": [],
+    "suggested": [
+      "color",
+      "accessibility-baseline"
+    ],
+    "exemptions": []
+  }
+}
