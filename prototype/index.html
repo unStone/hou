@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f3eadb">
+  <meta name="description" content="厚 · 读厚，再读薄。在合适的时刻，用几分钟考察一次理解。">
+  <title>今天 · 厚 Hou</title>
+  <link rel="icon" href="../brand/icon/hou-icon-master.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="views.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" aria-label="应用导航">
+      <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="brand">
+        <img id="brand-icon" src="../brand/icon/hou-icon-master.png" width="1024" height="1024" alt="厚应用图标，五层水墨叠成山形">
+        <div class="od-field"><span class="brand-name serif">厚</span><span class="brand-tag">读厚，再读薄。</span></div>
+      </div>
+      <nav aria-label="主导航">
+        <button type="button" class="nav-item" data-action="today" data-nav="today" id="home-nav" aria-current="page"><svg class="od-icon icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M6 3v4m8-4v4M3 9h14m-10 4h2"/></svg><span>今天</span><span class="nav-count" id="nav-count">03</span></button>
+        <button type="button" class="nav-item" data-action="library" data-nav="library"><svg class="od-icon icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h5a3 3 0 0 1 3 3v10a4 4 0 0 0-3-1H3zm14 0h-3a3 3 0 0 0-3 3v10a4 4 0 0 1 3-1h3z"/></svg><span>内容库</span></button>
+        <button type="button" class="nav-item" data-action="records" data-nav="records"><svg class="od-icon icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h8l3 3v11H5zM12 3v4h4M8 10h5m-5 3h5"/></svg><span>运行记录</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="reading-mini"><div class="caption">接着上次，慢慢读</div><button type="button" data-action="continue-reading" id="mini-title">《厚》产品方案</button><div class="chapter-mini" id="mini-chapter">产品定位</div><div class="mini-track" aria-hidden="true"><span id="mini-progress"></span></div></div>
+        <button type="button" class="settings-nav" data-action="toggle-theme"><span id="theme-glyph"><svg class="od-icon icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 12a7 7 0 0 1-9-9 7 7 0 1 0 9 9Z"/></svg></span><span class="nav-text" id="theme-label">深色外观</span><span class="sr-only">切换外观</span></button>
+        <button type="button" class="settings-nav" data-action="settings" data-nav="settings" aria-label="设置"><svg class="od-icon icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h12"/><circle cx="7" cy="5" r="2"/><circle cx="13" cy="10" r="2"/><circle cx="8" cy="15" r="2"/></svg><span class="nav-text">设置</span></button>
+        <div class="session-note">本地示例 · 未连接模型<br>操作仅保留在本次会话</div>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="crumb"><span>我的学习</span><svg class="od-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="m7 5 5 5-5 5"/></svg><span id="crumb-current">今天</span></div>
+        <div class="top-actions">
+          <button type="button" class="quiet" data-action="claim" aria-label="主动领取一次考察"><span class="claim-text">领取考察</span><span class="kbd shortcut-label">⌘ ⇧ H</span><svg class="od-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg></button>
+          <button type="button" class="icon-button panel-trigger" data-action="queue" id="queue-button" aria-label="查看菜单栏待完成列表" aria-expanded="false" aria-controls="queue-body"><svg class="od-icon icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h12l-2-3V8a4 4 0 0 0-8 0v3zm4 3h4"/></svg><span class="count" id="queue-count">3</span></button>
+        </div>
+      </header>
+      <main id="content" aria-label="厚应用内容"></main>
+    </div>
+  </div>
+  <dialog id="dialog" aria-label="操作面板"><div id="dialog-body"></div></dialog>
+  <div class="sheet-overlay" id="queue-overlay" hidden><section class="menu-panel" id="queue-body" role="dialog" aria-modal="true" aria-label="菜单栏待完成列表"></section></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-text"></span><button type="button" data-action="close-toast" aria-label="关闭提示"><svg class="od-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="m5 5 10 10M5 15 15 5"/></svg></button></div>
+  <noscript><p>请启用 JavaScript，以使用《厚》的阅读与考察交互。</p></noscript>
+</body>
+</html>

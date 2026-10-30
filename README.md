@@ -17,6 +17,7 @@
 | `manifest.json`、`USAGE.md`、`assets/`、`fonts/` | Open Design 设计系统包 |
 | `docs/PRD.md` | 产品方案：目标、用户流程、功能设计、调研验证 |
 | `brand/` | 品牌物料：图标、标志、横版组合、macOS 图标、网站图标、自媒体头像与封面、品牌规范板；总览页为 `brand/index.html`，说明见 `brand/brand-guidelines.md` |
+| `prototype/` | 用 Open Design 制作的可交互原型（静态示例数据，未接入模型）；在仓库根目录启动任意静态服务器后打开 `prototype/index.html` |
 | `scripts/` | 从图标母版重新生成标志与各类物料的脚本 |
 
 ## 在 Open Design 中使用
