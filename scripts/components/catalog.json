@@ -1,0 +1,59 @@
+{
+  "intro": "每个组件都按浅色、深色和桌面、手机分别渲染，可以直接点击和用键盘操作。窗口只演示组件自身的状态变化；跳转、保存等业务按钮点击后会提示不执行。按编号提问题，例如“C25 选中态不够明显”。",
+  "groups": [
+    {"name": "基础控件", "items": [
+      {"id": "C01", "name": "主按钮", "usage": "每屏最多一个，用于开始考察、提交作答、保存配置", "interaction": "悬停、按下", "variants": [{"label": "默认", "keys": ["primary"]}]},
+      {"id": "C02", "name": "领取考察按钮", "usage": "顶栏右侧，带快捷键提示", "interaction": "悬停、按下", "note": "手机宽度下文字与快捷键隐藏，只保留加号图标", "scene": "topbar", "variants": [{"label": "默认", "keys": ["claim-button"]}]},
+      {"id": "C03", "name": "文字按钮", "usage": "稍后再做、上一个情境等次要操作", "interaction": "悬停、按下", "variants": [{"label": "默认", "keys": ["text-button"]}]},
+      {"id": "C04", "name": "图标按钮", "usage": "顶栏铃铛，带待完成数量标记", "interaction": "悬停、按下", "scene": "topbar", "variants": [{"label": "默认", "keys": ["icon-button"]}]},
+      {"id": "C05", "name": "快捷键标签", "usage": "提示全局快捷键", "interaction": "无", "variants": [{"label": "默认", "keys": ["kbd"]}]},
+      {"id": "C06", "name": "编号标签与状态点", "usage": "待完成数量、状态提示", "interaction": "无", "variants": [{"label": "编号标签", "keys": ["number-tag"]}, {"label": "状态点", "keys": ["status-dot"]}]}
+    ]},
+    {"name": "导航", "items": [
+      {"id": "C07", "name": "侧栏导航项", "usage": "今天、内容库、运行记录", "interaction": "悬停；点击其他页切换当前项", "scene": "sidebar", "variants": [{"label": "当前页与其他页", "keys": ["nav-item-active", "nav-item"]}]},
+      {"id": "C08", "name": "侧栏底部设置项", "usage": "外观切换、设置入口", "interaction": "悬停、按下", "scene": "sidebar", "variants": [{"label": "默认", "keys": ["settings-nav"]}]},
+      {"id": "C09", "name": "继续阅读小卡", "usage": "侧栏底部，回到上次阅读的位置", "interaction": "悬停", "scene": "sidebar", "variants": [{"label": "默认", "keys": ["reading-mini"]}]},
+      {"id": "C10", "name": "面包屑", "usage": "顶栏左侧，显示当前位置", "interaction": "无", "variants": [{"label": "默认", "keys": ["crumb"]}]},
+      {"id": "C11", "name": "分段标签", "usage": "内容库的阅读中、已归档", "interaction": "点击或用 ← → 切换选中项，Tab 只停在选中项", "variants": [{"label": "默认", "keys": ["tabs"]}]}
+    ]},
+    {"name": "页面结构与列表", "items": [
+      {"id": "C12", "name": "页面标题区", "usage": "每页顶部的眉标、标题和说明", "interaction": "无", "variants": [{"label": "今天", "keys": ["page-head"]}, {"label": "日期戳", "keys": ["calendar-stamp"]}]},
+      {"id": "C13", "name": "区块标题", "usage": "页面内的分区标题，右侧可带说明", "interaction": "无", "variants": [{"label": "默认", "keys": ["section-heading"]}]},
+      {"id": "C14", "name": "行动卡片", "usage": "今天页的核心：现在该做的一件事", "interaction": "悬停、按下", "variants": [{"label": "默认", "keys": ["action-card"]}]},
+      {"id": "C15", "name": "待完成条目", "usage": "今天页与菜单栏面板的列表项", "interaction": "悬停", "variants": [{"label": "默认", "keys": ["pending-row"]}]},
+      {"id": "C16", "name": "安排条目", "usage": "接下来的考察安排", "interaction": "悬停理由按钮出现下划线", "variants": [{"label": "默认", "keys": ["schedule-item"]}]},
+      {"id": "C17", "name": "内容库条目", "usage": "一份导入的书或网页", "interaction": "悬停", "variants": [{"label": "默认", "keys": ["library-row"]}]},
+      {"id": "C18", "name": "运行记录条目", "usage": "一次钩子执行的记录", "interaction": "悬停", "variants": [{"label": "默认", "keys": ["log-row"]}]},
+      {"id": "C19", "name": "掌握程度条目", "usage": "按内容汇总的 5 档掌握程度", "interaction": "悬停", "variants": [{"label": "默认", "keys": ["mastery-row"]}]},
+      {"id": "C20", "name": "知识点列表", "usage": "章节读完后提取的知识点", "interaction": "点击 × 移除，再点恢复；焦点留在当前卡片", "variants": [{"label": "默认", "keys": ["extraction-list"]}, {"label": "移除一个后", "keys": ["extraction-list-removed"]}]}
+    ]},
+    {"name": "表单", "items": [
+      {"id": "C21", "name": "设置区块", "usage": "设置页的一个分组，含输入框与按钮", "interaction": "输入、聚焦", "variants": [{"label": "默认", "keys": ["settings-section"]}, {"label": "校验失败", "keys": ["settings-section-error"]}]},
+      {"id": "C22", "name": "开关行", "usage": "设置页的开关项", "interaction": "点击开关，圆点滑动", "variants": [{"label": "默认", "keys": ["settings-row-switch"]}]},
+      {"id": "C23", "name": "多行输入", "usage": "考察里的判断理由", "interaction": "输入、聚焦", "variants": [{"label": "默认", "keys": ["form-field-reason"]}]}
+    ]},
+    {"name": "考察", "items": [
+      {"id": "C24", "name": "考察顶栏", "usage": "考察与反馈页顶部", "interaction": "悬停", "variants": [{"label": "默认", "keys": ["assessment-top"]}]},
+      {"id": "C25", "name": "选项组", "usage": "单选，键盘可操作", "interaction": "点击或用方向键选择，勾选淡入、颜色过渡；Tab 只停在选中项", "variants": [{"label": "未选择", "keys": ["game-options"]}, {"label": "已选择 B", "keys": ["game-options-selected"]}]},
+      {"id": "C26", "name": "情境进度", "usage": "当前是第几个情境", "interaction": "无", "variants": [{"label": "默认", "keys": ["step-track"]}]},
+      {"id": "C27", "name": "考察底栏", "usage": "出处、上一步与主按钮", "interaction": "第一个变体与选项组联动：选中任一选项后提示消失、主按钮启用", "variants": [{"label": "与选项组联动", "keys": ["game-options", "game-bottom-disabled"]}, {"label": "已选择", "keys": ["game-bottom"]}]},
+      {"id": "C28", "name": "判断结果卡", "usage": "掌握程度与核对说明", "interaction": "无", "variants": [{"label": "默认", "keys": ["result-card"]}]},
+      {"id": "C29", "name": "作答对照", "usage": "每个情境的作答与原文依据", "interaction": "无", "variants": [{"label": "默认", "keys": ["result-details"]}]}
+    ]},
+    {"name": "反馈与浮层", "items": [
+      {"id": "C30", "name": "加载状态", "usage": "生成考察、提取知识点时", "interaction": "加载线循环往复；减少动态效果时改为原地明暗变化", "variants": [{"label": "准备考察", "keys": ["loading-game"]}, {"label": "提取知识点", "keys": ["loading-extract"]}]},
+      {"id": "C31", "name": "空状态", "usage": "列表没有内容时", "interaction": "无", "variants": [{"label": "已归档为空", "keys": ["empty"]}]},
+      {"id": "C32", "name": "提示条", "usage": "页面内的说明", "interaction": "无", "variants": [{"label": "默认", "keys": ["notice"]}]},
+      {"id": "C33", "name": "轻提示", "usage": "操作完成后在底部出现", "interaction": "点击 × 淡出，可重新显示", "note": "窗口里没有侧栏，轻提示按窗口居中；原型桌面端按主内容区居中", "scene": "toast", "variants": [{"label": "默认", "keys": ["toast"]}]},
+      {"id": "C34", "name": "菜单栏面板", "usage": "铃铛展开的待完成列表，手机上为贴底弹层", "interaction": "点击 × 或按 Esc 淡出，可重新显示", "scene": "sheet", "variants": [{"label": "默认", "keys": ["menu-panel"]}]},
+      {"id": "C35", "name": "导入对话框", "usage": "导入文件、网页或正文", "interaction": "点击或用 ← → 切换标签；选择或拖入文件查看提示；点击 × 或按 Esc 淡出，可重新显示", "scene": "dialog", "variants": [{"label": "文件", "keys": ["dialog-file"]}, {"label": "网页链接校验失败", "keys": ["dialog-web-error"]}, {"label": "粘贴正文", "keys": ["dialog-text"]}]},
+      {"id": "C36", "name": "异议对话框", "usage": "对判分结果提出异议", "interaction": "输入理由；选择档位；点击 × 或按 Esc 淡出，可重新显示", "scene": "dialog", "variants": [{"label": "填写理由", "keys": ["dispute-dialog"]}, {"label": "示例复核结果", "keys": ["dispute-review"]}]},
+      {"id": "C37", "name": "安排理由对话框", "usage": "为什么把考察安排在这时", "interaction": "点击 × 或按 Esc 淡出，可重新显示", "scene": "dialog", "variants": [{"label": "默认", "keys": ["reason-dialog"]}]}
+    ]},
+    {"name": "阅读", "items": [
+      {"id": "C38", "name": "章节目录", "usage": "阅读器左侧", "interaction": "点击切换当前章节", "variants": [{"label": "默认", "keys": ["toc"]}]},
+      {"id": "C39", "name": "阅读工具栏", "usage": "高亮段落、添加批注", "interaction": "悬停、按下", "variants": [{"label": "默认", "keys": ["reader-tools"]}]},
+      {"id": "C40", "name": "阅读底栏", "usage": "章节进度与标记读完", "interaction": "悬停、按下", "variants": [{"label": "默认", "keys": ["reader-bottom"]}]}
+    ]}
+  ]
+}

@@ -17,8 +17,8 @@
 | `manifest.json`、`USAGE.md`、`assets/`、`fonts/` | Open Design 设计系统包 |
 | `docs/PRD.md` | 产品方案：目标、用户流程、功能设计、调研验证 |
 | `brand/` | 品牌物料：图标、标志、横版组合、macOS 图标、网站图标、自媒体头像与封面、品牌规范板；总览页为 `brand/index.html`，说明见 `brand/brand-guidelines.md` |
-| `prototype/` | 用 Open Design 制作的可交互原型（静态示例数据，未接入模型）；在仓库根目录启动任意静态服务器后打开 `prototype/index.html` |
-| `scripts/` | 从图标母版重新生成标志与各类物料的脚本 |
+| `prototype/` | 用 Open Design 制作的可交互原型（静态示例数据，未接入模型）；`prototype/components.html` 为通用组件总览，按浅色、深色和桌面、手机分别渲染，可直接点击操作。需通过本地服务器打开：在仓库根目录运行 `python3 -m http.server 5179`，访问 `http://localhost:5179/prototype/index.html` 或 `http://localhost:5179/prototype/components.html` |
+| `scripts/` | 从图标母版重新生成标志与各类物料的脚本；`scripts/components/` 为通用组件总览的生成脚本 |
 
 ## 在 Open Design 中使用
 
@@ -32,7 +32,7 @@
 
 ## 重新生成物料
 
-需要 ImageMagick 7（`magick` 命令）以及 Python 3 与 Pillow。
+需要 ImageMagick 7（`magick` 命令）、Python 3 以及 `scripts/requirements.txt` 中的依赖（`pip install -r scripts/requirements.txt`）。
 
 ```bash
 # 从 brand/icon/hou-icon-master.png 提取透明底标志、深色母版与 Icon Composer 图层
@@ -43,6 +43,18 @@ python3 -I scripts/brand_compose.py "$PWD"
 ```
 
 两个脚本都会同步更新设计系统包中的 `assets/`。
+
+## 重新生成通用组件总览
+
+`prototype/components.html` 与 `prototype/components/data.js` 由脚本生成：在原型中采集各组件实际渲染出的 HTML，再逐个测量展示窗口高度。组件清单、用途与交互说明写在 `scripts/components/catalog.json`。修改原型或清单后，先在仓库根目录启动静态服务，再运行生成脚本（使用本机安装的 Google Chrome）：
+
+```bash
+python3 -m http.server 5179
+```
+
+```bash
+python3 -I scripts/components/build.py http://localhost:5179
+```
 
 ## 许可证
 

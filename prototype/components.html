@@ -1,0 +1,606 @@
+<!doctype html>
+<!-- 由 scripts/components/build.py 生成，请修改生成脚本或 scripts/components/catalog.json 后重新生成 -->
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>通用组件 · 厚 Hou</title>
+<link rel="icon" href="../brand/icon/hou-icon-master.png">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="components/gallery.css">
+</head>
+<body data-show-theme="all" data-show-device="all">
+<div id="cmp-static-warning" hidden style="padding:16px 24px;background:#B83F29;color:#F3EADB;font:14px/1.7 -apple-system,'PingFang SC',sans-serif">
+  这个页面引用了同目录的样式表和组件窗口，作为单个文件预览时无法加载。请在 hou 仓库根目录运行 <code>python3 -m http.server 5179</code>，再打开 <code>http://localhost:5179/prototype/components.html</code>。
+</div>
+<script>
+  // 作为单文件预览（如 data: 地址）时同目录资源无法加载，样式表不存在，此时显示打开方式
+  if (![...document.styleSheets].some(sheet => sheet.href && sheet.href.endsWith('/styles.css'))) document.getElementById('cmp-static-warning').hidden = false;
+</script>
+<div class="cmp-page">
+  <aside class="cmp-index" aria-label="组件目录">
+    <h1>通用组件</h1>
+    <p>每个组件都按浅色、深色和桌面、手机分别渲染，可以直接点击和用键盘操作。窗口只演示组件自身的状态变化；跳转、保存等业务按钮点击后会提示不执行。按编号提问题，例如“C25 选中态不够明显”。</p>
+    <details class="cmp-index-list"><summary>组件目录（40）</summary>
+    <nav>
+      <a href="#C01">C01 主按钮</a>
+      <a href="#C02">C02 领取考察按钮</a>
+      <a href="#C03">C03 文字按钮</a>
+      <a href="#C04">C04 图标按钮</a>
+      <a href="#C05">C05 快捷键标签</a>
+      <a href="#C06">C06 编号标签与状态点</a>
+      <a href="#C07">C07 侧栏导航项</a>
+      <a href="#C08">C08 侧栏底部设置项</a>
+      <a href="#C09">C09 继续阅读小卡</a>
+      <a href="#C10">C10 面包屑</a>
+      <a href="#C11">C11 分段标签</a>
+      <a href="#C12">C12 页面标题区</a>
+      <a href="#C13">C13 区块标题</a>
+      <a href="#C14">C14 行动卡片</a>
+      <a href="#C15">C15 待完成条目</a>
+      <a href="#C16">C16 安排条目</a>
+      <a href="#C17">C17 内容库条目</a>
+      <a href="#C18">C18 运行记录条目</a>
+      <a href="#C19">C19 掌握程度条目</a>
+      <a href="#C20">C20 知识点列表</a>
+      <a href="#C21">C21 设置区块</a>
+      <a href="#C22">C22 开关行</a>
+      <a href="#C23">C23 多行输入</a>
+      <a href="#C24">C24 考察顶栏</a>
+      <a href="#C25">C25 选项组</a>
+      <a href="#C26">C26 情境进度</a>
+      <a href="#C27">C27 考察底栏</a>
+      <a href="#C28">C28 判断结果卡</a>
+      <a href="#C29">C29 作答对照</a>
+      <a href="#C30">C30 加载状态</a>
+      <a href="#C31">C31 空状态</a>
+      <a href="#C32">C32 提示条</a>
+      <a href="#C33">C33 轻提示</a>
+      <a href="#C34">C34 菜单栏面板</a>
+      <a href="#C35">C35 导入对话框</a>
+      <a href="#C36">C36 异议对话框</a>
+      <a href="#C37">C37 安排理由对话框</a>
+      <a href="#C38">C38 章节目录</a>
+      <a href="#C39">C39 阅读工具栏</a>
+      <a href="#C40">C40 阅读底栏</a>
+    </nav>
+    </details>
+  </aside>
+  <div class="cmp-main">
+    <div class="cmp-toolbar">
+      <div class="cmp-filter"><span id="cmp-theme-label">外观</span><div class="tabs" role="tablist" aria-labelledby="cmp-theme-label"><button type="button" role="tab" data-show="theme" data-value="all">全部</button><button type="button" role="tab" data-show="theme" data-value="light">浅色</button><button type="button" role="tab" data-show="theme" data-value="dark">深色</button></div></div>
+      <div class="cmp-filter"><span id="cmp-device-label">设备</span><div class="tabs" role="tablist" aria-labelledby="cmp-device-label"><button type="button" role="tab" data-show="device" data-value="all">全部</button><button type="button" role="tab" data-show="device" data-value="desktop">桌面</button><button type="button" role="tab" data-show="device" data-value="mobile">手机</button></div></div>
+    </div>
+    <main class="cmp-content">
+<section class="cmp-group"><h2>基础控件</h2>
+<article class="cmp-card" id="C01">
+  <header class="cmp-card-head"><span class="cmp-id">C01</span><h3>主按钮</h3><p>每屏最多一个，用于开始考察、提交作答、保存配置</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="主按钮 默认 浅色桌面" data-frame="primary--light--desktop" data-src="components/frame.html?key=primary&amp;theme=light&amp;frame=primary--light--desktop" width="1120" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="主按钮 默认 深色桌面" data-frame="primary--dark--desktop" data-src="components/frame.html?key=primary&amp;theme=dark&amp;frame=primary--dark--desktop" width="1120" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="主按钮 默认 浅色手机" data-frame="primary--light--mobile" data-src="components/frame.html?key=primary&amp;theme=light&amp;frame=primary--light--mobile" width="390" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="主按钮 默认 深色手机" data-frame="primary--dark--mobile" data-src="components/frame.html?key=primary&amp;theme=dark&amp;frame=primary--dark--mobile" width="390" height="92"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C02">
+  <header class="cmp-card-head"><span class="cmp-id">C02</span><h3>领取考察按钮</h3><p>顶栏右侧，带快捷键提示</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <p class="cmp-interaction">说明：手机宽度下文字与快捷键隐藏，只保留加号图标</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="领取考察按钮 默认 浅色桌面" data-frame="claim-button--light--desktop" data-src="components/frame.html?key=claim-button&amp;theme=light&amp;frame=claim-button--light--desktop" width="1120" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="领取考察按钮 默认 深色桌面" data-frame="claim-button--dark--desktop" data-src="components/frame.html?key=claim-button&amp;theme=dark&amp;frame=claim-button--dark--desktop" width="1120" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="领取考察按钮 默认 浅色手机" data-frame="claim-button--light--mobile" data-src="components/frame.html?key=claim-button&amp;theme=light&amp;frame=claim-button--light--mobile" width="390" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="领取考察按钮 默认 深色手机" data-frame="claim-button--dark--mobile" data-src="components/frame.html?key=claim-button&amp;theme=dark&amp;frame=claim-button--dark--mobile" width="390" height="84"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C03">
+  <header class="cmp-card-head"><span class="cmp-id">C03</span><h3>文字按钮</h3><p>稍后再做、上一个情境等次要操作</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="文字按钮 默认 浅色桌面" data-frame="text-button--light--desktop" data-src="components/frame.html?key=text-button&amp;theme=light&amp;frame=text-button--light--desktop" width="1120" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="文字按钮 默认 深色桌面" data-frame="text-button--dark--desktop" data-src="components/frame.html?key=text-button&amp;theme=dark&amp;frame=text-button--dark--desktop" width="1120" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="文字按钮 默认 浅色手机" data-frame="text-button--light--mobile" data-src="components/frame.html?key=text-button&amp;theme=light&amp;frame=text-button--light--mobile" width="390" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="文字按钮 默认 深色手机" data-frame="text-button--dark--mobile" data-src="components/frame.html?key=text-button&amp;theme=dark&amp;frame=text-button--dark--mobile" width="390" height="84"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C04">
+  <header class="cmp-card-head"><span class="cmp-id">C04</span><h3>图标按钮</h3><p>顶栏铃铛，带待完成数量标记</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="图标按钮 默认 浅色桌面" data-frame="icon-button--light--desktop" data-src="components/frame.html?key=icon-button&amp;theme=light&amp;frame=icon-button--light--desktop" width="1120" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="图标按钮 默认 深色桌面" data-frame="icon-button--dark--desktop" data-src="components/frame.html?key=icon-button&amp;theme=dark&amp;frame=icon-button--dark--desktop" width="1120" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="图标按钮 默认 浅色手机" data-frame="icon-button--light--mobile" data-src="components/frame.html?key=icon-button&amp;theme=light&amp;frame=icon-button--light--mobile" width="390" height="84"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="图标按钮 默认 深色手机" data-frame="icon-button--dark--mobile" data-src="components/frame.html?key=icon-button&amp;theme=dark&amp;frame=icon-button--dark--mobile" width="390" height="84"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C05">
+  <header class="cmp-card-head"><span class="cmp-id">C05</span><h3>快捷键标签</h3><p>提示全局快捷键</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="快捷键标签 默认 浅色桌面" data-frame="kbd--light--desktop" data-src="components/frame.html?key=kbd&amp;theme=light&amp;frame=kbd--light--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="快捷键标签 默认 深色桌面" data-frame="kbd--dark--desktop" data-src="components/frame.html?key=kbd&amp;theme=dark&amp;frame=kbd--dark--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="快捷键标签 默认 浅色手机" data-frame="kbd--light--mobile" data-src="components/frame.html?key=kbd&amp;theme=light&amp;frame=kbd--light--mobile" width="390" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="快捷键标签 默认 深色手机" data-frame="kbd--dark--mobile" data-src="components/frame.html?key=kbd&amp;theme=dark&amp;frame=kbd--dark--mobile" width="390" height="80"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C06">
+  <header class="cmp-card-head"><span class="cmp-id">C06</span><h3>编号标签与状态点</h3><p>待完成数量、状态提示</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">编号标签</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="编号标签与状态点 编号标签 浅色桌面" data-frame="number-tag--light--desktop" data-src="components/frame.html?key=number-tag&amp;theme=light&amp;frame=number-tag--light--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="编号标签与状态点 编号标签 深色桌面" data-frame="number-tag--dark--desktop" data-src="components/frame.html?key=number-tag&amp;theme=dark&amp;frame=number-tag--dark--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="编号标签与状态点 编号标签 浅色手机" data-frame="number-tag--light--mobile" data-src="components/frame.html?key=number-tag&amp;theme=light&amp;frame=number-tag--light--mobile" width="390" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="编号标签与状态点 编号标签 深色手机" data-frame="number-tag--dark--mobile" data-src="components/frame.html?key=number-tag&amp;theme=dark&amp;frame=number-tag--dark--mobile" width="390" height="80"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">状态点</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="编号标签与状态点 状态点 浅色桌面" data-frame="status-dot--light--desktop" data-src="components/frame.html?key=status-dot&amp;theme=light&amp;frame=status-dot--light--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="编号标签与状态点 状态点 深色桌面" data-frame="status-dot--dark--desktop" data-src="components/frame.html?key=status-dot&amp;theme=dark&amp;frame=status-dot--dark--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="编号标签与状态点 状态点 浅色手机" data-frame="status-dot--light--mobile" data-src="components/frame.html?key=status-dot&amp;theme=light&amp;frame=status-dot--light--mobile" width="390" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="编号标签与状态点 状态点 深色手机" data-frame="status-dot--dark--mobile" data-src="components/frame.html?key=status-dot&amp;theme=dark&amp;frame=status-dot--dark--mobile" width="390" height="80"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+<section class="cmp-group"><h2>导航</h2>
+<article class="cmp-card" id="C07">
+  <header class="cmp-card-head"><span class="cmp-id">C07</span><h3>侧栏导航项</h3><p>今天、内容库、运行记录</p></header>
+  <p class="cmp-interaction">可操作：悬停；点击其他页切换当前项</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">当前页与其他页</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="侧栏导航项 当前页与其他页 浅色桌面" data-frame="nav-item-active+nav-item--light--desktop" data-src="components/frame.html?key=nav-item-active%2Bnav-item&amp;theme=light&amp;frame=nav-item-active%2Bnav-item--light--desktop" width="1120" height="144"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="侧栏导航项 当前页与其他页 深色桌面" data-frame="nav-item-active+nav-item--dark--desktop" data-src="components/frame.html?key=nav-item-active%2Bnav-item&amp;theme=dark&amp;frame=nav-item-active%2Bnav-item--dark--desktop" width="1120" height="144"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="侧栏导航项 当前页与其他页 浅色手机" data-frame="nav-item-active+nav-item--light--mobile" data-src="components/frame.html?key=nav-item-active%2Bnav-item&amp;theme=light&amp;frame=nav-item-active%2Bnav-item--light--mobile" width="390" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="侧栏导航项 当前页与其他页 深色手机" data-frame="nav-item-active+nav-item--dark--mobile" data-src="components/frame.html?key=nav-item-active%2Bnav-item&amp;theme=dark&amp;frame=nav-item-active%2Bnav-item--dark--mobile" width="390" height="92"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C08">
+  <header class="cmp-card-head"><span class="cmp-id">C08</span><h3>侧栏底部设置项</h3><p>外观切换、设置入口</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="侧栏底部设置项 默认 浅色桌面" data-frame="settings-nav--light--desktop" data-src="components/frame.html?key=settings-nav&amp;theme=light&amp;frame=settings-nav--light--desktop" width="1120" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="侧栏底部设置项 默认 深色桌面" data-frame="settings-nav--dark--desktop" data-src="components/frame.html?key=settings-nav&amp;theme=dark&amp;frame=settings-nav--dark--desktop" width="1120" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="侧栏底部设置项 默认 浅色手机" data-frame="settings-nav--light--mobile" data-src="components/frame.html?key=settings-nav&amp;theme=light&amp;frame=settings-nav--light--mobile" width="390" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="侧栏底部设置项 默认 深色手机" data-frame="settings-nav--dark--mobile" data-src="components/frame.html?key=settings-nav&amp;theme=dark&amp;frame=settings-nav--dark--mobile" width="390" height="92"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C09">
+  <header class="cmp-card-head"><span class="cmp-id">C09</span><h3>继续阅读小卡</h3><p>侧栏底部，回到上次阅读的位置</p></header>
+  <p class="cmp-interaction">可操作：悬停</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="继续阅读小卡 默认 浅色桌面" data-frame="reading-mini--light--desktop" data-src="components/frame.html?key=reading-mini&amp;theme=light&amp;frame=reading-mini--light--desktop" width="1120" height="228"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="继续阅读小卡 默认 深色桌面" data-frame="reading-mini--dark--desktop" data-src="components/frame.html?key=reading-mini&amp;theme=dark&amp;frame=reading-mini--dark--desktop" width="1120" height="228"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="继续阅读小卡 默认 浅色手机" data-frame="reading-mini--light--mobile" data-src="components/frame.html?key=reading-mini&amp;theme=light&amp;frame=reading-mini--light--mobile" width="390" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="继续阅读小卡 默认 深色手机" data-frame="reading-mini--dark--mobile" data-src="components/frame.html?key=reading-mini&amp;theme=dark&amp;frame=reading-mini--dark--mobile" width="390" height="80"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C10">
+  <header class="cmp-card-head"><span class="cmp-id">C10</span><h3>面包屑</h3><p>顶栏左侧，显示当前位置</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="面包屑 默认 浅色桌面" data-frame="crumb--light--desktop" data-src="components/frame.html?key=crumb&amp;theme=light&amp;frame=crumb--light--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="面包屑 默认 深色桌面" data-frame="crumb--dark--desktop" data-src="components/frame.html?key=crumb&amp;theme=dark&amp;frame=crumb--dark--desktop" width="1120" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="面包屑 默认 浅色手机" data-frame="crumb--light--mobile" data-src="components/frame.html?key=crumb&amp;theme=light&amp;frame=crumb--light--mobile" width="390" height="80"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="面包屑 默认 深色手机" data-frame="crumb--dark--mobile" data-src="components/frame.html?key=crumb&amp;theme=dark&amp;frame=crumb--dark--mobile" width="390" height="80"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C11">
+  <header class="cmp-card-head"><span class="cmp-id">C11</span><h3>分段标签</h3><p>内容库的阅读中、已归档</p></header>
+  <p class="cmp-interaction">可操作：点击或用 ← → 切换选中项，Tab 只停在选中项</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="分段标签 默认 浅色桌面" data-frame="tabs--light--desktop" data-src="components/frame.html?key=tabs&amp;theme=light&amp;frame=tabs--light--desktop" width="1120" height="90"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="分段标签 默认 深色桌面" data-frame="tabs--dark--desktop" data-src="components/frame.html?key=tabs&amp;theme=dark&amp;frame=tabs--dark--desktop" width="1120" height="90"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="分段标签 默认 浅色手机" data-frame="tabs--light--mobile" data-src="components/frame.html?key=tabs&amp;theme=light&amp;frame=tabs--light--mobile" width="390" height="90"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="分段标签 默认 深色手机" data-frame="tabs--dark--mobile" data-src="components/frame.html?key=tabs&amp;theme=dark&amp;frame=tabs--dark--mobile" width="390" height="90"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+<section class="cmp-group"><h2>页面结构与列表</h2>
+<article class="cmp-card" id="C12">
+  <header class="cmp-card-head"><span class="cmp-id">C12</span><h3>页面标题区</h3><p>每页顶部的眉标、标题和说明</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">今天</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="页面标题区 今天 浅色桌面" data-frame="page-head--light--desktop" data-src="components/frame.html?key=page-head&amp;theme=light&amp;frame=page-head--light--desktop" width="1120" height="214"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="页面标题区 今天 深色桌面" data-frame="page-head--dark--desktop" data-src="components/frame.html?key=page-head&amp;theme=dark&amp;frame=page-head--dark--desktop" width="1120" height="214"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="页面标题区 今天 浅色手机" data-frame="page-head--light--mobile" data-src="components/frame.html?key=page-head&amp;theme=light&amp;frame=page-head--light--mobile" width="390" height="187"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="页面标题区 今天 深色手机" data-frame="page-head--dark--mobile" data-src="components/frame.html?key=page-head&amp;theme=dark&amp;frame=page-head--dark--mobile" width="390" height="187"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">日期戳</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="页面标题区 日期戳 浅色桌面" data-frame="calendar-stamp--light--desktop" data-src="components/frame.html?key=calendar-stamp&amp;theme=light&amp;frame=calendar-stamp--light--desktop" width="1120" height="129"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="页面标题区 日期戳 深色桌面" data-frame="calendar-stamp--dark--desktop" data-src="components/frame.html?key=calendar-stamp&amp;theme=dark&amp;frame=calendar-stamp--dark--desktop" width="1120" height="129"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="页面标题区 日期戳 浅色手机" data-frame="calendar-stamp--light--mobile" data-src="components/frame.html?key=calendar-stamp&amp;theme=light&amp;frame=calendar-stamp--light--mobile" width="390" height="113"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="页面标题区 日期戳 深色手机" data-frame="calendar-stamp--dark--mobile" data-src="components/frame.html?key=calendar-stamp&amp;theme=dark&amp;frame=calendar-stamp--dark--mobile" width="390" height="113"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C13">
+  <header class="cmp-card-head"><span class="cmp-id">C13</span><h3>区块标题</h3><p>页面内的分区标题，右侧可带说明</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="区块标题 默认 浅色桌面" data-frame="section-heading--light--desktop" data-src="components/frame.html?key=section-heading&amp;theme=light&amp;frame=section-heading--light--desktop" width="1120" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="区块标题 默认 深色桌面" data-frame="section-heading--dark--desktop" data-src="components/frame.html?key=section-heading&amp;theme=dark&amp;frame=section-heading--dark--desktop" width="1120" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="区块标题 默认 浅色手机" data-frame="section-heading--light--mobile" data-src="components/frame.html?key=section-heading&amp;theme=light&amp;frame=section-heading--light--mobile" width="390" height="92"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="区块标题 默认 深色手机" data-frame="section-heading--dark--mobile" data-src="components/frame.html?key=section-heading&amp;theme=dark&amp;frame=section-heading--dark--mobile" width="390" height="92"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C14">
+  <header class="cmp-card-head"><span class="cmp-id">C14</span><h3>行动卡片</h3><p>今天页的核心：现在该做的一件事</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="行动卡片 默认 浅色桌面" data-frame="action-card--light--desktop" data-src="components/frame.html?key=action-card&amp;theme=light&amp;frame=action-card--light--desktop" width="1120" height="357"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="行动卡片 默认 深色桌面" data-frame="action-card--dark--desktop" data-src="components/frame.html?key=action-card&amp;theme=dark&amp;frame=action-card--dark--desktop" width="1120" height="357"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="行动卡片 默认 浅色手机" data-frame="action-card--light--mobile" data-src="components/frame.html?key=action-card&amp;theme=light&amp;frame=action-card--light--mobile" width="390" height="454"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="行动卡片 默认 深色手机" data-frame="action-card--dark--mobile" data-src="components/frame.html?key=action-card&amp;theme=dark&amp;frame=action-card--dark--mobile" width="390" height="454"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C15">
+  <header class="cmp-card-head"><span class="cmp-id">C15</span><h3>待完成条目</h3><p>今天页与菜单栏面板的列表项</p></header>
+  <p class="cmp-interaction">可操作：悬停</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="待完成条目 默认 浅色桌面" data-frame="pending-row--light--desktop" data-src="components/frame.html?key=pending-row&amp;theme=light&amp;frame=pending-row--light--desktop" width="1120" height="139"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="待完成条目 默认 深色桌面" data-frame="pending-row--dark--desktop" data-src="components/frame.html?key=pending-row&amp;theme=dark&amp;frame=pending-row--dark--desktop" width="1120" height="139"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="待完成条目 默认 浅色手机" data-frame="pending-row--light--mobile" data-src="components/frame.html?key=pending-row&amp;theme=light&amp;frame=pending-row--light--mobile" width="390" height="136"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="待完成条目 默认 深色手机" data-frame="pending-row--dark--mobile" data-src="components/frame.html?key=pending-row&amp;theme=dark&amp;frame=pending-row--dark--mobile" width="390" height="136"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C16">
+  <header class="cmp-card-head"><span class="cmp-id">C16</span><h3>安排条目</h3><p>接下来的考察安排</p></header>
+  <p class="cmp-interaction">可操作：悬停理由按钮出现下划线</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="安排条目 默认 浅色桌面" data-frame="schedule-item--light--desktop" data-src="components/frame.html?key=schedule-item&amp;theme=light&amp;frame=schedule-item--light--desktop" width="1120" height="190"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="安排条目 默认 深色桌面" data-frame="schedule-item--dark--desktop" data-src="components/frame.html?key=schedule-item&amp;theme=dark&amp;frame=schedule-item--dark--desktop" width="1120" height="190"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="安排条目 默认 浅色手机" data-frame="schedule-item--light--mobile" data-src="components/frame.html?key=schedule-item&amp;theme=light&amp;frame=schedule-item--light--mobile" width="390" height="190"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="安排条目 默认 深色手机" data-frame="schedule-item--dark--mobile" data-src="components/frame.html?key=schedule-item&amp;theme=dark&amp;frame=schedule-item--dark--mobile" width="390" height="190"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C17">
+  <header class="cmp-card-head"><span class="cmp-id">C17</span><h3>内容库条目</h3><p>一份导入的书或网页</p></header>
+  <p class="cmp-interaction">可操作：悬停</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="内容库条目 默认 浅色桌面" data-frame="library-row--light--desktop" data-src="components/frame.html?key=library-row&amp;theme=light&amp;frame=library-row--light--desktop" width="1120" height="183"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="内容库条目 默认 深色桌面" data-frame="library-row--dark--desktop" data-src="components/frame.html?key=library-row&amp;theme=dark&amp;frame=library-row--dark--desktop" width="1120" height="183"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="内容库条目 默认 浅色手机" data-frame="library-row--light--mobile" data-src="components/frame.html?key=library-row&amp;theme=light&amp;frame=library-row--light--mobile" width="390" height="180"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="内容库条目 默认 深色手机" data-frame="library-row--dark--mobile" data-src="components/frame.html?key=library-row&amp;theme=dark&amp;frame=library-row--dark--mobile" width="390" height="180"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C18">
+  <header class="cmp-card-head"><span class="cmp-id">C18</span><h3>运行记录条目</h3><p>一次钩子执行的记录</p></header>
+  <p class="cmp-interaction">可操作：悬停</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="运行记录条目 默认 浅色桌面" data-frame="log-row--light--desktop" data-src="components/frame.html?key=log-row&amp;theme=light&amp;frame=log-row--light--desktop" width="1120" height="175"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="运行记录条目 默认 深色桌面" data-frame="log-row--dark--desktop" data-src="components/frame.html?key=log-row&amp;theme=dark&amp;frame=log-row--dark--desktop" width="1120" height="175"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="运行记录条目 默认 浅色手机" data-frame="log-row--light--mobile" data-src="components/frame.html?key=log-row&amp;theme=light&amp;frame=log-row--light--mobile" width="390" height="174"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="运行记录条目 默认 深色手机" data-frame="log-row--dark--mobile" data-src="components/frame.html?key=log-row&amp;theme=dark&amp;frame=log-row--dark--mobile" width="390" height="174"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C19">
+  <header class="cmp-card-head"><span class="cmp-id">C19</span><h3>掌握程度条目</h3><p>按内容汇总的 5 档掌握程度</p></header>
+  <p class="cmp-interaction">可操作：悬停</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="掌握程度条目 默认 浅色桌面" data-frame="mastery-row--light--desktop" data-src="components/frame.html?key=mastery-row&amp;theme=light&amp;frame=mastery-row--light--desktop" width="1120" height="94"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="掌握程度条目 默认 深色桌面" data-frame="mastery-row--dark--desktop" data-src="components/frame.html?key=mastery-row&amp;theme=dark&amp;frame=mastery-row--dark--desktop" width="1120" height="94"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="掌握程度条目 默认 浅色手机" data-frame="mastery-row--light--mobile" data-src="components/frame.html?key=mastery-row&amp;theme=light&amp;frame=mastery-row--light--mobile" width="390" height="93"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="掌握程度条目 默认 深色手机" data-frame="mastery-row--dark--mobile" data-src="components/frame.html?key=mastery-row&amp;theme=dark&amp;frame=mastery-row--dark--mobile" width="390" height="93"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C20">
+  <header class="cmp-card-head"><span class="cmp-id">C20</span><h3>知识点列表</h3><p>章节读完后提取的知识点</p></header>
+  <p class="cmp-interaction">可操作：点击 × 移除，再点恢复；焦点留在当前卡片</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="知识点列表 默认 浅色桌面" data-frame="extraction-list--light--desktop" data-src="components/frame.html?key=extraction-list&amp;theme=light&amp;frame=extraction-list--light--desktop" width="1120" height="236"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="知识点列表 默认 深色桌面" data-frame="extraction-list--dark--desktop" data-src="components/frame.html?key=extraction-list&amp;theme=dark&amp;frame=extraction-list--dark--desktop" width="1120" height="236"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="知识点列表 默认 浅色手机" data-frame="extraction-list--light--mobile" data-src="components/frame.html?key=extraction-list&amp;theme=light&amp;frame=extraction-list--light--mobile" width="390" height="259"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="知识点列表 默认 深色手机" data-frame="extraction-list--dark--mobile" data-src="components/frame.html?key=extraction-list&amp;theme=dark&amp;frame=extraction-list--dark--mobile" width="390" height="259"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">移除一个后</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="知识点列表 移除一个后 浅色桌面" data-frame="extraction-list-removed--light--desktop" data-src="components/frame.html?key=extraction-list-removed&amp;theme=light&amp;frame=extraction-list-removed--light--desktop" width="1120" height="204"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="知识点列表 移除一个后 深色桌面" data-frame="extraction-list-removed--dark--desktop" data-src="components/frame.html?key=extraction-list-removed&amp;theme=dark&amp;frame=extraction-list-removed--dark--desktop" width="1120" height="204"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="知识点列表 移除一个后 浅色手机" data-frame="extraction-list-removed--light--mobile" data-src="components/frame.html?key=extraction-list-removed&amp;theme=light&amp;frame=extraction-list-removed--light--mobile" width="390" height="204"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="知识点列表 移除一个后 深色手机" data-frame="extraction-list-removed--dark--mobile" data-src="components/frame.html?key=extraction-list-removed&amp;theme=dark&amp;frame=extraction-list-removed--dark--mobile" width="390" height="204"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+<section class="cmp-group"><h2>表单</h2>
+<article class="cmp-card" id="C21">
+  <header class="cmp-card-head"><span class="cmp-id">C21</span><h3>设置区块</h3><p>设置页的一个分组，含输入框与按钮</p></header>
+  <p class="cmp-interaction">可操作：输入、聚焦</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="设置区块 默认 浅色桌面" data-frame="settings-section--light--desktop" data-src="components/frame.html?key=settings-section&amp;theme=light&amp;frame=settings-section--light--desktop" width="1120" height="523"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="设置区块 默认 深色桌面" data-frame="settings-section--dark--desktop" data-src="components/frame.html?key=settings-section&amp;theme=dark&amp;frame=settings-section--dark--desktop" width="1120" height="523"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="设置区块 默认 浅色手机" data-frame="settings-section--light--mobile" data-src="components/frame.html?key=settings-section&amp;theme=light&amp;frame=settings-section--light--mobile" width="390" height="689"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="设置区块 默认 深色手机" data-frame="settings-section--dark--mobile" data-src="components/frame.html?key=settings-section&amp;theme=dark&amp;frame=settings-section--dark--mobile" width="390" height="689"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">校验失败</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="设置区块 校验失败 浅色桌面" data-frame="settings-section-error--light--desktop" data-src="components/frame.html?key=settings-section-error&amp;theme=light&amp;frame=settings-section-error--light--desktop" width="1120" height="549"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="设置区块 校验失败 深色桌面" data-frame="settings-section-error--dark--desktop" data-src="components/frame.html?key=settings-section-error&amp;theme=dark&amp;frame=settings-section-error--dark--desktop" width="1120" height="549"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="设置区块 校验失败 浅色手机" data-frame="settings-section-error--light--mobile" data-src="components/frame.html?key=settings-section-error&amp;theme=light&amp;frame=settings-section-error--light--mobile" width="390" height="716"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="设置区块 校验失败 深色手机" data-frame="settings-section-error--dark--mobile" data-src="components/frame.html?key=settings-section-error&amp;theme=dark&amp;frame=settings-section-error--dark--mobile" width="390" height="716"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C22">
+  <header class="cmp-card-head"><span class="cmp-id">C22</span><h3>开关行</h3><p>设置页的开关项</p></header>
+  <p class="cmp-interaction">可操作：点击开关，圆点滑动</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="开关行 默认 浅色桌面" data-frame="settings-row-switch--light--desktop" data-src="components/frame.html?key=settings-row-switch&amp;theme=light&amp;frame=settings-row-switch--light--desktop" width="1120" height="139"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="开关行 默认 深色桌面" data-frame="settings-row-switch--dark--desktop" data-src="components/frame.html?key=settings-row-switch&amp;theme=dark&amp;frame=settings-row-switch--dark--desktop" width="1120" height="139"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="开关行 默认 浅色手机" data-frame="settings-row-switch--light--mobile" data-src="components/frame.html?key=settings-row-switch&amp;theme=light&amp;frame=settings-row-switch--light--mobile" width="390" height="139"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="开关行 默认 深色手机" data-frame="settings-row-switch--dark--mobile" data-src="components/frame.html?key=settings-row-switch&amp;theme=dark&amp;frame=settings-row-switch--dark--mobile" width="390" height="139"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C23">
+  <header class="cmp-card-head"><span class="cmp-id">C23</span><h3>多行输入</h3><p>考察里的判断理由</p></header>
+  <p class="cmp-interaction">可操作：输入、聚焦</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="多行输入 默认 浅色桌面" data-frame="form-field-reason--light--desktop" data-src="components/frame.html?key=form-field-reason&amp;theme=light&amp;frame=form-field-reason--light--desktop" width="1120" height="266"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="多行输入 默认 深色桌面" data-frame="form-field-reason--dark--desktop" data-src="components/frame.html?key=form-field-reason&amp;theme=dark&amp;frame=form-field-reason--dark--desktop" width="1120" height="266"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="多行输入 默认 浅色手机" data-frame="form-field-reason--light--mobile" data-src="components/frame.html?key=form-field-reason&amp;theme=light&amp;frame=form-field-reason--light--mobile" width="390" height="266"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="多行输入 默认 深色手机" data-frame="form-field-reason--dark--mobile" data-src="components/frame.html?key=form-field-reason&amp;theme=dark&amp;frame=form-field-reason--dark--mobile" width="390" height="266"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+<section class="cmp-group"><h2>考察</h2>
+<article class="cmp-card" id="C24">
+  <header class="cmp-card-head"><span class="cmp-id">C24</span><h3>考察顶栏</h3><p>考察与反馈页顶部</p></header>
+  <p class="cmp-interaction">可操作：悬停</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="考察顶栏 默认 浅色桌面" data-frame="assessment-top--light--desktop" data-src="components/frame.html?key=assessment-top&amp;theme=light&amp;frame=assessment-top--light--desktop" width="1120" height="169"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="考察顶栏 默认 深色桌面" data-frame="assessment-top--dark--desktop" data-src="components/frame.html?key=assessment-top&amp;theme=dark&amp;frame=assessment-top--dark--desktop" width="1120" height="169"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="考察顶栏 默认 浅色手机" data-frame="assessment-top--light--mobile" data-src="components/frame.html?key=assessment-top&amp;theme=light&amp;frame=assessment-top--light--mobile" width="390" height="153"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="考察顶栏 默认 深色手机" data-frame="assessment-top--dark--mobile" data-src="components/frame.html?key=assessment-top&amp;theme=dark&amp;frame=assessment-top--dark--mobile" width="390" height="153"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C25">
+  <header class="cmp-card-head"><span class="cmp-id">C25</span><h3>选项组</h3><p>单选，键盘可操作</p></header>
+  <p class="cmp-interaction">可操作：点击或用方向键选择，勾选淡入、颜色过渡；Tab 只停在选中项</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">未选择</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="选项组 未选择 浅色桌面" data-frame="game-options--light--desktop" data-src="components/frame.html?key=game-options&amp;theme=light&amp;frame=game-options--light--desktop" width="1120" height="368"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="选项组 未选择 深色桌面" data-frame="game-options--dark--desktop" data-src="components/frame.html?key=game-options&amp;theme=dark&amp;frame=game-options--dark--desktop" width="1120" height="368"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="选项组 未选择 浅色手机" data-frame="game-options--light--mobile" data-src="components/frame.html?key=game-options&amp;theme=light&amp;frame=game-options--light--mobile" width="390" height="344"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="选项组 未选择 深色手机" data-frame="game-options--dark--mobile" data-src="components/frame.html?key=game-options&amp;theme=dark&amp;frame=game-options--dark--mobile" width="390" height="344"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">已选择 B</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="选项组 已选择 B 浅色桌面" data-frame="game-options-selected--light--desktop" data-src="components/frame.html?key=game-options-selected&amp;theme=light&amp;frame=game-options-selected--light--desktop" width="1120" height="368"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="选项组 已选择 B 深色桌面" data-frame="game-options-selected--dark--desktop" data-src="components/frame.html?key=game-options-selected&amp;theme=dark&amp;frame=game-options-selected--dark--desktop" width="1120" height="368"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="选项组 已选择 B 浅色手机" data-frame="game-options-selected--light--mobile" data-src="components/frame.html?key=game-options-selected&amp;theme=light&amp;frame=game-options-selected--light--mobile" width="390" height="344"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="选项组 已选择 B 深色手机" data-frame="game-options-selected--dark--mobile" data-src="components/frame.html?key=game-options-selected&amp;theme=dark&amp;frame=game-options-selected--dark--mobile" width="390" height="344"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C26">
+  <header class="cmp-card-head"><span class="cmp-id">C26</span><h3>情境进度</h3><p>当前是第几个情境</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="情境进度 默认 浅色桌面" data-frame="step-track--light--desktop" data-src="components/frame.html?key=step-track&amp;theme=light&amp;frame=step-track--light--desktop" width="1120" height="83"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="情境进度 默认 深色桌面" data-frame="step-track--dark--desktop" data-src="components/frame.html?key=step-track&amp;theme=dark&amp;frame=step-track--dark--desktop" width="1120" height="83"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="情境进度 默认 浅色手机" data-frame="step-track--light--mobile" data-src="components/frame.html?key=step-track&amp;theme=light&amp;frame=step-track--light--mobile" width="390" height="83"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="情境进度 默认 深色手机" data-frame="step-track--dark--mobile" data-src="components/frame.html?key=step-track&amp;theme=dark&amp;frame=step-track--dark--mobile" width="390" height="83"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C27">
+  <header class="cmp-card-head"><span class="cmp-id">C27</span><h3>考察底栏</h3><p>出处、上一步与主按钮</p></header>
+  <p class="cmp-interaction">可操作：第一个变体与选项组联动：选中任一选项后提示消失、主按钮启用</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">与选项组联动</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="考察底栏 与选项组联动 浅色桌面" data-frame="game-options+game-bottom-disabled--light--desktop" data-src="components/frame.html?key=game-options%2Bgame-bottom-disabled&amp;theme=light&amp;frame=game-options%2Bgame-bottom-disabled--light--desktop" width="1120" height="444"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="考察底栏 与选项组联动 深色桌面" data-frame="game-options+game-bottom-disabled--dark--desktop" data-src="components/frame.html?key=game-options%2Bgame-bottom-disabled&amp;theme=dark&amp;frame=game-options%2Bgame-bottom-disabled--dark--desktop" width="1120" height="444"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="考察底栏 与选项组联动 浅色手机" data-frame="game-options+game-bottom-disabled--light--mobile" data-src="components/frame.html?key=game-options%2Bgame-bottom-disabled&amp;theme=light&amp;frame=game-options%2Bgame-bottom-disabled--light--mobile" width="390" height="452"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="考察底栏 与选项组联动 深色手机" data-frame="game-options+game-bottom-disabled--dark--mobile" data-src="components/frame.html?key=game-options%2Bgame-bottom-disabled&amp;theme=dark&amp;frame=game-options%2Bgame-bottom-disabled--dark--mobile" width="390" height="452"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">已选择</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="考察底栏 已选择 浅色桌面" data-frame="game-bottom--light--desktop" data-src="components/frame.html?key=game-bottom&amp;theme=light&amp;frame=game-bottom--light--desktop" width="1120" height="124"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="考察底栏 已选择 深色桌面" data-frame="game-bottom--dark--desktop" data-src="components/frame.html?key=game-bottom&amp;theme=dark&amp;frame=game-bottom--dark--desktop" width="1120" height="124"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="考察底栏 已选择 浅色手机" data-frame="game-bottom--light--mobile" data-src="components/frame.html?key=game-bottom&amp;theme=light&amp;frame=game-bottom--light--mobile" width="390" height="156"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="考察底栏 已选择 深色手机" data-frame="game-bottom--dark--mobile" data-src="components/frame.html?key=game-bottom&amp;theme=dark&amp;frame=game-bottom--dark--mobile" width="390" height="156"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C28">
+  <header class="cmp-card-head"><span class="cmp-id">C28</span><h3>判断结果卡</h3><p>掌握程度与核对说明</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="判断结果卡 默认 浅色桌面" data-frame="result-card--light--desktop" data-src="components/frame.html?key=result-card&amp;theme=light&amp;frame=result-card--light--desktop" width="1120" height="320"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="判断结果卡 默认 深色桌面" data-frame="result-card--dark--desktop" data-src="components/frame.html?key=result-card&amp;theme=dark&amp;frame=result-card--dark--desktop" width="1120" height="320"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="判断结果卡 默认 浅色手机" data-frame="result-card--light--mobile" data-src="components/frame.html?key=result-card&amp;theme=light&amp;frame=result-card--light--mobile" width="390" height="320"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="判断结果卡 默认 深色手机" data-frame="result-card--dark--mobile" data-src="components/frame.html?key=result-card&amp;theme=dark&amp;frame=result-card--dark--mobile" width="390" height="320"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C29">
+  <header class="cmp-card-head"><span class="cmp-id">C29</span><h3>作答对照</h3><p>每个情境的作答与原文依据</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="作答对照 默认 浅色桌面" data-frame="result-details--light--desktop" data-src="components/frame.html?key=result-details&amp;theme=light&amp;frame=result-details--light--desktop" width="1120" height="271"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="作答对照 默认 深色桌面" data-frame="result-details--dark--desktop" data-src="components/frame.html?key=result-details&amp;theme=dark&amp;frame=result-details--dark--desktop" width="1120" height="271"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="作答对照 默认 浅色手机" data-frame="result-details--light--mobile" data-src="components/frame.html?key=result-details&amp;theme=light&amp;frame=result-details--light--mobile" width="390" height="375"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="作答对照 默认 深色手机" data-frame="result-details--dark--mobile" data-src="components/frame.html?key=result-details&amp;theme=dark&amp;frame=result-details--dark--mobile" width="390" height="375"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+<section class="cmp-group"><h2>反馈与浮层</h2>
+<article class="cmp-card" id="C30">
+  <header class="cmp-card-head"><span class="cmp-id">C30</span><h3>加载状态</h3><p>生成考察、提取知识点时</p></header>
+  <p class="cmp-interaction">可操作：加载线循环往复；减少动态效果时改为原地明暗变化</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">准备考察</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="加载状态 准备考察 浅色桌面" data-frame="loading-game--light--desktop" data-src="components/frame.html?key=loading-game&amp;theme=light&amp;frame=loading-game--light--desktop" width="1120" height="394"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="加载状态 准备考察 深色桌面" data-frame="loading-game--dark--desktop" data-src="components/frame.html?key=loading-game&amp;theme=dark&amp;frame=loading-game--dark--desktop" width="1120" height="394"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="加载状态 准备考察 浅色手机" data-frame="loading-game--light--mobile" data-src="components/frame.html?key=loading-game&amp;theme=light&amp;frame=loading-game--light--mobile" width="390" height="394"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="加载状态 准备考察 深色手机" data-frame="loading-game--dark--mobile" data-src="components/frame.html?key=loading-game&amp;theme=dark&amp;frame=loading-game--dark--mobile" width="390" height="394"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">提取知识点</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="加载状态 提取知识点 浅色桌面" data-frame="loading-extract--light--desktop" data-src="components/frame.html?key=loading-extract&amp;theme=light&amp;frame=loading-extract--light--desktop" width="1120" height="282"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="加载状态 提取知识点 深色桌面" data-frame="loading-extract--dark--desktop" data-src="components/frame.html?key=loading-extract&amp;theme=dark&amp;frame=loading-extract--dark--desktop" width="1120" height="282"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="加载状态 提取知识点 浅色手机" data-frame="loading-extract--light--mobile" data-src="components/frame.html?key=loading-extract&amp;theme=light&amp;frame=loading-extract--light--mobile" width="390" height="282"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="加载状态 提取知识点 深色手机" data-frame="loading-extract--dark--mobile" data-src="components/frame.html?key=loading-extract&amp;theme=dark&amp;frame=loading-extract--dark--mobile" width="390" height="282"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C31">
+  <header class="cmp-card-head"><span class="cmp-id">C31</span><h3>空状态</h3><p>列表没有内容时</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">已归档为空</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="空状态 已归档为空 浅色桌面" data-frame="empty--light--desktop" data-src="components/frame.html?key=empty&amp;theme=light&amp;frame=empty--light--desktop" width="1120" height="301"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="空状态 已归档为空 深色桌面" data-frame="empty--dark--desktop" data-src="components/frame.html?key=empty&amp;theme=dark&amp;frame=empty--dark--desktop" width="1120" height="301"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="空状态 已归档为空 浅色手机" data-frame="empty--light--mobile" data-src="components/frame.html?key=empty&amp;theme=light&amp;frame=empty--light--mobile" width="390" height="301"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="空状态 已归档为空 深色手机" data-frame="empty--dark--mobile" data-src="components/frame.html?key=empty&amp;theme=dark&amp;frame=empty--dark--mobile" width="390" height="301"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C32">
+  <header class="cmp-card-head"><span class="cmp-id">C32</span><h3>提示条</h3><p>页面内的说明</p></header>
+  <p class="cmp-interaction">可操作：无</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="提示条 默认 浅色桌面" data-frame="notice--light--desktop" data-src="components/frame.html?key=notice&amp;theme=light&amp;frame=notice--light--desktop" width="1120" height="103"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="提示条 默认 深色桌面" data-frame="notice--dark--desktop" data-src="components/frame.html?key=notice&amp;theme=dark&amp;frame=notice--dark--desktop" width="1120" height="103"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="提示条 默认 浅色手机" data-frame="notice--light--mobile" data-src="components/frame.html?key=notice&amp;theme=light&amp;frame=notice--light--mobile" width="390" height="127"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="提示条 默认 深色手机" data-frame="notice--dark--mobile" data-src="components/frame.html?key=notice&amp;theme=dark&amp;frame=notice--dark--mobile" width="390" height="127"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C33">
+  <header class="cmp-card-head"><span class="cmp-id">C33</span><h3>轻提示</h3><p>操作完成后在底部出现</p></header>
+  <p class="cmp-interaction">可操作：点击 × 淡出，可重新显示</p>
+  <p class="cmp-interaction">说明：窗口里没有侧栏，轻提示按窗口居中；原型桌面端按主内容区居中</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="轻提示 默认 浅色桌面" data-frame="toast--light--desktop" data-src="components/frame.html?key=toast&amp;theme=light&amp;frame=toast--light--desktop" width="1120" height="94"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="轻提示 默认 深色桌面" data-frame="toast--dark--desktop" data-src="components/frame.html?key=toast&amp;theme=dark&amp;frame=toast--dark--desktop" width="1120" height="94"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="轻提示 默认 浅色手机" data-frame="toast--light--mobile" data-src="components/frame.html?key=toast&amp;theme=light&amp;frame=toast--light--mobile" width="390" height="158"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="轻提示 默认 深色手机" data-frame="toast--dark--mobile" data-src="components/frame.html?key=toast&amp;theme=dark&amp;frame=toast--dark--mobile" width="390" height="158"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C34">
+  <header class="cmp-card-head"><span class="cmp-id">C34</span><h3>菜单栏面板</h3><p>铃铛展开的待完成列表，手机上为贴底弹层</p></header>
+  <p class="cmp-interaction">可操作：点击 × 或按 Esc 淡出，可重新显示</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="菜单栏面板 默认 浅色桌面" data-frame="menu-panel--light--desktop" data-src="components/frame.html?key=menu-panel&amp;theme=light&amp;frame=menu-panel--light--desktop" width="1120" height="631"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="菜单栏面板 默认 深色桌面" data-frame="menu-panel--dark--desktop" data-src="components/frame.html?key=menu-panel&amp;theme=dark&amp;frame=menu-panel--dark--desktop" width="1120" height="631"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="菜单栏面板 默认 浅色手机" data-frame="menu-panel--light--mobile" data-src="components/frame.html?key=menu-panel&amp;theme=light&amp;frame=menu-panel--light--mobile" width="390" height="589"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="菜单栏面板 默认 深色手机" data-frame="menu-panel--dark--mobile" data-src="components/frame.html?key=menu-panel&amp;theme=dark&amp;frame=menu-panel--dark--mobile" width="390" height="589"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C35">
+  <header class="cmp-card-head"><span class="cmp-id">C35</span><h3>导入对话框</h3><p>导入文件、网页或正文</p></header>
+  <p class="cmp-interaction">可操作：点击或用 ← → 切换标签；选择或拖入文件查看提示；点击 × 或按 Esc 淡出，可重新显示</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">文件</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="导入对话框 文件 浅色桌面" data-frame="dialog-file--light--desktop" data-src="components/frame.html?key=dialog-file&amp;theme=light&amp;frame=dialog-file--light--desktop" width="1120" height="523"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="导入对话框 文件 深色桌面" data-frame="dialog-file--dark--desktop" data-src="components/frame.html?key=dialog-file&amp;theme=dark&amp;frame=dialog-file--dark--desktop" width="1120" height="523"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="导入对话框 文件 浅色手机" data-frame="dialog-file--light--mobile" data-src="components/frame.html?key=dialog-file&amp;theme=light&amp;frame=dialog-file--light--mobile" width="390" height="523"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="导入对话框 文件 深色手机" data-frame="dialog-file--dark--mobile" data-src="components/frame.html?key=dialog-file&amp;theme=dark&amp;frame=dialog-file--dark--mobile" width="390" height="523"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">网页链接校验失败</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="导入对话框 网页链接校验失败 浅色桌面" data-frame="dialog-web-error--light--desktop" data-src="components/frame.html?key=dialog-web-error&amp;theme=light&amp;frame=dialog-web-error--light--desktop" width="1120" height="494"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="导入对话框 网页链接校验失败 深色桌面" data-frame="dialog-web-error--dark--desktop" data-src="components/frame.html?key=dialog-web-error&amp;theme=dark&amp;frame=dialog-web-error--dark--desktop" width="1120" height="494"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="导入对话框 网页链接校验失败 浅色手机" data-frame="dialog-web-error--light--mobile" data-src="components/frame.html?key=dialog-web-error&amp;theme=light&amp;frame=dialog-web-error--light--mobile" width="390" height="518"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="导入对话框 网页链接校验失败 深色手机" data-frame="dialog-web-error--dark--mobile" data-src="components/frame.html?key=dialog-web-error&amp;theme=dark&amp;frame=dialog-web-error--dark--mobile" width="390" height="518"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">粘贴正文</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="导入对话框 粘贴正文 浅色桌面" data-frame="dialog-text--light--desktop" data-src="components/frame.html?key=dialog-text&amp;theme=light&amp;frame=dialog-text--light--desktop" width="1120" height="706"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="导入对话框 粘贴正文 深色桌面" data-frame="dialog-text--dark--desktop" data-src="components/frame.html?key=dialog-text&amp;theme=dark&amp;frame=dialog-text--dark--desktop" width="1120" height="706"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="导入对话框 粘贴正文 浅色手机" data-frame="dialog-text--light--mobile" data-src="components/frame.html?key=dialog-text&amp;theme=light&amp;frame=dialog-text--light--mobile" width="390" height="722"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="导入对话框 粘贴正文 深色手机" data-frame="dialog-text--dark--mobile" data-src="components/frame.html?key=dialog-text&amp;theme=dark&amp;frame=dialog-text--dark--mobile" width="390" height="722"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C36">
+  <header class="cmp-card-head"><span class="cmp-id">C36</span><h3>异议对话框</h3><p>对判分结果提出异议</p></header>
+  <p class="cmp-interaction">可操作：输入理由；选择档位；点击 × 或按 Esc 淡出，可重新显示</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">填写理由</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="异议对话框 填写理由 浅色桌面" data-frame="dispute-dialog--light--desktop" data-src="components/frame.html?key=dispute-dialog&amp;theme=light&amp;frame=dispute-dialog--light--desktop" width="1120" height="513"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="异议对话框 填写理由 深色桌面" data-frame="dispute-dialog--dark--desktop" data-src="components/frame.html?key=dispute-dialog&amp;theme=dark&amp;frame=dispute-dialog--dark--desktop" width="1120" height="513"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="异议对话框 填写理由 浅色手机" data-frame="dispute-dialog--light--mobile" data-src="components/frame.html?key=dispute-dialog&amp;theme=light&amp;frame=dispute-dialog--light--mobile" width="390" height="562"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="异议对话框 填写理由 深色手机" data-frame="dispute-dialog--dark--mobile" data-src="components/frame.html?key=dispute-dialog&amp;theme=dark&amp;frame=dispute-dialog--dark--mobile" width="390" height="562"></iframe></div></figure>
+  </div></div>
+  <div class="cmp-variant"><div class="cmp-variant-label">示例复核结果</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="异议对话框 示例复核结果 浅色桌面" data-frame="dispute-review--light--desktop" data-src="components/frame.html?key=dispute-review&amp;theme=light&amp;frame=dispute-review--light--desktop" width="1120" height="619"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="异议对话框 示例复核结果 深色桌面" data-frame="dispute-review--dark--desktop" data-src="components/frame.html?key=dispute-review&amp;theme=dark&amp;frame=dispute-review--dark--desktop" width="1120" height="619"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="异议对话框 示例复核结果 浅色手机" data-frame="dispute-review--light--mobile" data-src="components/frame.html?key=dispute-review&amp;theme=light&amp;frame=dispute-review--light--mobile" width="390" height="718"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="异议对话框 示例复核结果 深色手机" data-frame="dispute-review--dark--mobile" data-src="components/frame.html?key=dispute-review&amp;theme=dark&amp;frame=dispute-review--dark--mobile" width="390" height="718"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C37">
+  <header class="cmp-card-head"><span class="cmp-id">C37</span><h3>安排理由对话框</h3><p>为什么把考察安排在这时</p></header>
+  <p class="cmp-interaction">可操作：点击 × 或按 Esc 淡出，可重新显示</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="安排理由对话框 默认 浅色桌面" data-frame="reason-dialog--light--desktop" data-src="components/frame.html?key=reason-dialog&amp;theme=light&amp;frame=reason-dialog--light--desktop" width="1120" height="438"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="安排理由对话框 默认 深色桌面" data-frame="reason-dialog--dark--desktop" data-src="components/frame.html?key=reason-dialog&amp;theme=dark&amp;frame=reason-dialog--dark--desktop" width="1120" height="438"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="安排理由对话框 默认 浅色手机" data-frame="reason-dialog--light--mobile" data-src="components/frame.html?key=reason-dialog&amp;theme=light&amp;frame=reason-dialog--light--mobile" width="390" height="487"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="安排理由对话框 默认 深色手机" data-frame="reason-dialog--dark--mobile" data-src="components/frame.html?key=reason-dialog&amp;theme=dark&amp;frame=reason-dialog--dark--mobile" width="390" height="487"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+<section class="cmp-group"><h2>阅读</h2>
+<article class="cmp-card" id="C38">
+  <header class="cmp-card-head"><span class="cmp-id">C38</span><h3>章节目录</h3><p>阅读器左侧</p></header>
+  <p class="cmp-interaction">可操作：点击切换当前章节</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="章节目录 默认 浅色桌面" data-frame="toc--light--desktop" data-src="components/frame.html?key=toc&amp;theme=light&amp;frame=toc--light--desktop" width="1120" height="418"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="章节目录 默认 深色桌面" data-frame="toc--dark--desktop" data-src="components/frame.html?key=toc&amp;theme=dark&amp;frame=toc--dark--desktop" width="1120" height="418"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="章节目录 默认 浅色手机" data-frame="toc--light--mobile" data-src="components/frame.html?key=toc&amp;theme=light&amp;frame=toc--light--mobile" width="390" height="277"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="章节目录 默认 深色手机" data-frame="toc--dark--mobile" data-src="components/frame.html?key=toc&amp;theme=dark&amp;frame=toc--dark--mobile" width="390" height="277"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C39">
+  <header class="cmp-card-head"><span class="cmp-id">C39</span><h3>阅读工具栏</h3><p>高亮段落、添加批注</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="阅读工具栏 默认 浅色桌面" data-frame="reader-tools--light--desktop" data-src="components/frame.html?key=reader-tools&amp;theme=light&amp;frame=reader-tools--light--desktop" width="1120" height="153"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="阅读工具栏 默认 深色桌面" data-frame="reader-tools--dark--desktop" data-src="components/frame.html?key=reader-tools&amp;theme=dark&amp;frame=reader-tools--dark--desktop" width="1120" height="153"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="阅读工具栏 默认 浅色手机" data-frame="reader-tools--light--mobile" data-src="components/frame.html?key=reader-tools&amp;theme=light&amp;frame=reader-tools--light--mobile" width="390" height="153"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="阅读工具栏 默认 深色手机" data-frame="reader-tools--dark--mobile" data-src="components/frame.html?key=reader-tools&amp;theme=dark&amp;frame=reader-tools--dark--mobile" width="390" height="153"></iframe></div></figure>
+  </div></div>
+</article>
+<article class="cmp-card" id="C40">
+  <header class="cmp-card-head"><span class="cmp-id">C40</span><h3>阅读底栏</h3><p>章节进度与标记读完</p></header>
+  <p class="cmp-interaction">可操作：悬停、按下</p>
+  <div class="cmp-variant"><div class="cmp-variant-label">默认</div>
+  <div class="cmp-cells">
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="desktop"><figcaption>浅色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="阅读底栏 默认 浅色桌面" data-frame="reader-bottom--light--desktop" data-src="components/frame.html?key=reader-bottom&amp;theme=light&amp;frame=reader-bottom--light--desktop" width="1120" height="116"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="desktop"><figcaption>深色 · 桌面 1120px</figcaption><div class="cmp-viewport" data-width="1120"><iframe title="阅读底栏 默认 深色桌面" data-frame="reader-bottom--dark--desktop" data-src="components/frame.html?key=reader-bottom&amp;theme=dark&amp;frame=reader-bottom--dark--desktop" width="1120" height="116"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="light" data-device-cell="mobile"><figcaption>浅色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="阅读底栏 默认 浅色手机" data-frame="reader-bottom--light--mobile" data-src="components/frame.html?key=reader-bottom&amp;theme=light&amp;frame=reader-bottom--light--mobile" width="390" height="156"></iframe></div></figure>
+   <figure class="cmp-cell" data-theme-cell="dark" data-device-cell="mobile"><figcaption>深色 · 手机 390px</figcaption><div class="cmp-viewport" data-width="390"><iframe title="阅读底栏 默认 深色手机" data-frame="reader-bottom--dark--mobile" data-src="components/frame.html?key=reader-bottom&amp;theme=dark&amp;frame=reader-bottom--dark--mobile" width="390" height="156"></iframe></div></figure>
+  </div></div>
+</article>
+</section>
+    </main>
+  </div>
+</div>
+<script src="components/gallery.js"></script>
+</body>
+</html>

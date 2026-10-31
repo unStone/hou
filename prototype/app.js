@@ -3,12 +3,15 @@
  H.state={books:structuredClone(HouData.books),tasks:structuredClone(HouData.tasks),route:'today',bookId:'prd',filter:'active',completed:[],marks:{},notes:{},records:[],theme:'light',reduceMotion:false,sourceReturn:false,recordId:null,config:{url:'',model:'',shortcut:'⌘ ⇧ H',scheduled:false,time:'09:30'}};
  const $=id=>document.getElementById(id);
  const content=$('content'),dialog=$('dialog');
- let timer=null,toastTimer=null,lastFocus=null,importMode='file',generation=0;
- H.toast=message=>{clearTimeout(toastTimer);$('toast-text').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,6000)};
+ let timer=null,toastTimer=null,lastFocus=null,importMode='file',generation=0,renderedRoute=null;
+ H.toast=message=>{clearTimeout(toastTimer);const toast=$('toast');enter(toast);$('toast-text').textContent=message;toast.hidden=false;toastTimer=setTimeout(()=>leave(toast,()=>{toast.hidden=true}),6000)};
  H.render=(focus=false)=>{
   const s=H.state,views={today:H.today,library:H.library,reader:H.reader,extract:H.extract,game:H.game,result:H.result,settings:H.settings,records:H.records,log:H.log,schedule:H.schedule,'book-detail':H.bookDetail};
   if(!views[s.route])throw new Error(`无法显示页面：${s.route}`);
-  content.innerHTML=views[s.route]();
+  // 同一页面内的状态变化用 morph 保留原有节点，选中、开关等过渡动画才能播放；切换页面时整页替换以播放页面淡入
+  if(s.route===renderedRoute)Idiomorph.morph(content,views[s.route](),{morphStyle:'innerHTML'});
+  else content.innerHTML=views[s.route]();
+  renderedRoute=s.route;
   document.documentElement.dataset.theme=s.theme;
   document.documentElement.dataset.reduce=s.reduceMotion?'true':'false';
   $('app').classList.toggle('focus-mode',['game','result'].includes(s.route));
@@ -22,9 +25,12 @@
   if(focus){window.scrollTo(0,0);requestAnimationFrame(()=>{const target=content.querySelector('h1');if(target)target.focus({preventScroll:true})})}
  };
  H.go=route=>{H.closePanel();H.state.route=route;H.render(true)};
- H.modal=html=>{lastFocus=document.activeElement;$('dialog-body').innerHTML=html;dialog.showModal();requestAnimationFrame(()=>{const target=dialog.querySelector('input,textarea,button');target?.focus()})};
- H.closeModal=()=>{dialog.close();if(lastFocus?.isConnected)lastFocus.focus();else $('home-nav').focus()};
- H.closePanel=()=>{$('queue-overlay').hidden=true;$('queue-button').setAttribute('aria-expanded','false')};
+ // 退场：按 DESIGN.md 淡出 160ms 后再隐藏（淡出只改透明度，减少动态效果时同样保留）。退场中途重新打开会取消这次隐藏
+ const leave=(node,done)=>{clearTimeout(node.leaveTimer);node.dataset.leaving='true';node.leaveTimer=setTimeout(()=>{delete node.dataset.leaving;done()},160)};
+ const enter=node=>{clearTimeout(node.leaveTimer);delete node.dataset.leaving};
+ H.modal=html=>{enter(dialog);lastFocus=document.activeElement;$('dialog-body').innerHTML=html;if(!dialog.open)dialog.showModal();requestAnimationFrame(()=>{const target=dialog.querySelector('input,textarea,button');target?.focus()})};
+ H.closeModal=()=>leave(dialog,()=>{dialog.close();if(lastFocus?.isConnected)lastFocus.focus();else $('home-nav').focus()});
+ H.closePanel=()=>{const overlay=$('queue-overlay');$('queue-button').setAttribute('aria-expanded','false');if(overlay.hidden)return;leave(overlay,()=>{overlay.hidden=true})};
  const modalHead=title=>`<div class="dialog-header"><h2>${e(title)}</h2>${b(icon('close'),'close-modal','icon-button','aria-label="关闭"')}</div>`;
  const task=id=>{const t=H.state.tasks.find(x=>x.id===id);if(!t)throw new Error('找不到考察：'+id);return t};
  const timestamp=()=>{const d=new Date();return {date:d.toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'}),time:d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false})}};
@@ -41,16 +47,16 @@
   const token=++generation;clearTimeout(timer);timer=setTimeout(()=>{if(token!==generation||H.state.route!=='game')return;H.state.game.phase='playing';H.render(true)},1000);
  };
  const claim=()=>{const t=H.pending()[0]||H.scheduled()[0];if(t)H.start(t.id,'主动领取');else H.modal(modalHead('还没有可考察的内容')+'<p class="muted">读完一个章节并保留知识点后，就可以领取一次考察。</p><div class="form-actions">'+b('去阅读','claim-library','primary')+'</div>')};
- const queue=()=>{const list=H.pending();$('queue-body').innerHTML=`<div class="od-row spaced"><h2>待完成的考察</h2>${b(icon('close'),'close-panel','icon-button','aria-label="关闭待完成面板"')}</div><p class="caption" style="margin-top:8px">有空的时候，做一件就好。</p>${list.length?list.map(H.row).join(''):'<div class="notice" style="margin-top:24px">现在没有待完成的考察。新的安排会留在“今天”。</div>'}${b('主动领取一项 '+icon('arrow'),'claim','primary')}<p class="footnote">菜单栏面板的页面内预览</p>`;$('queue-overlay').hidden=false;$('queue-button').setAttribute('aria-expanded','true');requestAnimationFrame(()=>$('queue-body').querySelector('button')?.focus())};
+ const queue=()=>{const list=H.pending();$('queue-body').innerHTML=`<div class="od-row spaced"><h2>待完成的考察</h2>${b(icon('close'),'close-panel','icon-button','aria-label="关闭待完成面板"')}</div><p class="caption" style="margin-top:8px">有空的时候，做一件就好。</p>${list.length?list.map(H.row).join(''):'<div class="notice" style="margin-top:24px">现在没有待完成的考察。新的安排会留在“今天”。</div>'}${b('主动领取一项 '+icon('arrow'),'claim','primary')}<p class="footnote">菜单栏面板的页面内预览</p>`;enter($('queue-overlay'));$('queue-overlay').hidden=false;$('queue-button').setAttribute('aria-expanded','true');requestAnimationFrame(()=>$('queue-body').querySelector('button')?.focus())};
  const showImport=mode=>{
   importMode=mode;
-  const tabs=`<div class="tabs" role="tablist" aria-label="导入方式">${['file','web','text'].map((v,i)=>b(['文件','网页','正文'][i],'import-tab','',`data-value="${v}" role="tab" aria-selected="${mode===v}"`)).join('')}</div>`;
-  const forms={file:`<div class="dropzone" id="dropzone">${icon('upload')}<div class="od-field"><strong>拖入一本书，慢慢读。</strong><span class="caption">PDF / EPUB</span></div><label for="file-input" class="caption">或选择本地文件</label><input id="file-input" type="file" accept=".pdf,.epub" aria-describedby="file-note"></div><p class="caption" id="file-note">当前原型未接入 PDF / EPUB 正文解析。选择文件可查看导入状态；使用“正文”可完整体验阅读流程。</p>`,web:`<div class="form-field"><label for="import-url">网页链接</label><input id="import-url" type="url" placeholder="https://…"></div><p class="caption">原型不抓取外部网页。尝试导入后可以改为粘贴正文。</p><div class="form-actions">${b('导入网页','import-web','primary')}</div>`,text:`<div class="form-field"><label for="import-title">内容标题</label><input id="import-title" placeholder="为这份内容起一个名字" maxlength="120"></div><div class="form-field"><label for="import-text">正文</label><textarea id="import-text" placeholder="粘贴你准备阅读的正文…" rows="8"></textarea><span class="caption">整篇作为一个章节保留，仅用于当前会话。</span></div><div class="form-actions">${b('导入并阅读','import-text','primary')}</div>`};
+  const tabs=`<div class="tabs" role="tablist" aria-label="导入方式">${['file','web','text'].map((v,i)=>b(['文件','网页','正文'][i],'import-tab','',`data-value="${v}" role="tab" aria-selected="${mode===v}" tabindex="${mode===v?0:-1}"`)).join('')}</div>`;
+  const forms={file:`<div class="dropzone" id="dropzone">${icon('upload')}<div class="od-field"><strong>拖入一本书，慢慢读。</strong><span class="caption">PDF / EPUB</span></div><input id="file-input" class="sr-only" type="file" accept=".pdf,.epub" aria-describedby="file-note"><label for="file-input" class="secondary">选择本地文件</label></div><p class="caption" id="file-note">当前原型未接入 PDF / EPUB 正文解析。选择文件可查看导入状态；使用“正文”可完整体验阅读流程。</p>`,web:`<div class="form-field"><label for="import-url">网页链接</label><input id="import-url" type="url" placeholder="https://…"></div><p class="caption">原型不抓取外部网页。尝试导入后可以改为粘贴正文。</p><div class="form-actions">${b('导入网页','import-web','primary')}</div>`,text:`<div class="form-field"><label for="import-title">内容标题</label><input id="import-title" placeholder="为这份内容起一个名字" maxlength="120"></div><div class="form-field"><label for="import-text">正文</label><textarea id="import-text" placeholder="粘贴你准备阅读的正文…" rows="8"></textarea><span class="caption">整篇作为一个章节保留，仅用于当前会话。</span></div><div class="form-actions">${b('导入并阅读','import-text','primary')}</div>`};
   const html=modalHead('导入内容')+tabs+forms[mode]+'<div id="import-error" class="error" role="alert" hidden></div>';
-  if(dialog.open){$('dialog-body').innerHTML=html;requestAnimationFrame(()=>dialog.querySelector('input,button')?.focus())}else H.modal(html);
+  if(dialog.open){$('dialog-body').innerHTML=html;dialog.querySelector('[role="tab"][aria-selected="true"]').focus()}else H.modal(html);
  };
  const importError=message=>{const target=$('import-error');target.textContent=message;target.hidden=false};
- const fileSelected=file=>{if(!file)return;const allowed=/\.(pdf|epub)$/i.test(file.name);importError(allowed?`已选择“${file.name}”。当前原型尚未接入 ${file.name.split('.').pop().toUpperCase()} 正文解析，文件未导入。请切换到“正文”完成阅读体验。`:'文件格式不支持，请选择 PDF 或 EPUB，或使用正文导入。')};
+ const fileSelected=file=>{if(file)importError(HouImport.fileMessage(file.name))};
  const dateOption=(label,timeValue)=>b(label,'apply-delay','secondary',`data-value="${timeValue}"`);
  const showDelay=id=>{H.state.delayId=id;const t=task(id);H.modal(modalHead('稍后，再继续。')+`<p class="muted">${e(t.title)}</p><div class="od-stack gap-16" style="margin-top:24px">${dateOption('一小时后','一小时后')}${dateOption('今天晚上 · 20:00','今天 · 20:00')}${dateOption('明天早上 · 09:30','明天 · 09:30')}</div><p class="footnote">本地示例仅更新安排，不触发系统通知。</p>`) };
  const extract=()=>{
@@ -77,7 +83,7 @@
  };
  const actions={
   today:()=>H.go('today'),library:()=>H.go('library'),settings:()=>H.go('settings'),records:()=>H.go('records'),schedule:()=>H.go('schedule'),reader:()=>H.go('reader'),
-  start:el=>{H.closePanel();H.start(el.dataset.id)},claim,'queue':queue,'close-panel':()=>{H.closePanel();$('queue-button').focus()},'close-toast':()=>$('toast').hidden=true,'close-modal':H.closeModal,
+  start:el=>{H.closePanel();H.start(el.dataset.id)},claim,'queue':queue,'close-panel':()=>{H.closePanel();$('queue-button').focus()},'close-toast':()=>{clearTimeout(toastTimer);leave($('toast'),()=>{$('toast').hidden=true})},'close-modal':H.closeModal,
   'claim-library':()=>{H.closeModal();H.go('library')},filter:el=>{H.state.filter=el.dataset.value;H.render()},
   read:el=>{if(el.dataset.id)H.state.bookId=el.dataset.id;H.state.sourceReturn=false;H.go('reader')},'continue-reading':()=>{H.state.sourceReturn=false;H.go('reader')},
   chapter:el=>{H.book(H.state.bookId).chapter=Number(el.dataset.index);H.state.sourceReturn=false;H.render(true)},
@@ -122,8 +128,9 @@
   if(event.key==='Enter'&&event.target.id==='import-title'){event.preventDefault();actions['import-text']();return}
   if(event.key==='Enter'&&event.target.id==='import-url'){event.preventDefault();actions['import-web']();return}
   if((event.metaKey||event.ctrlKey)&&!dialog.open&&!['INPUT','TEXTAREA'].includes(event.target.tagName)){const c=H.state.config.shortcut,match=c.endsWith(event.key.toUpperCase())&&c.includes('⇧')===event.shiftKey&&c.includes('⌥')===event.altKey;if(match){event.preventDefault();if(H.state.route!=='game')claim()}}
-  const radio=event.target.closest('[role="radio"]');if(radio&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();const options=[...content.querySelectorAll('[role="radio"]')],i=options.indexOf(radio),direction=['ArrowLeft','ArrowUp'].includes(event.key)?-1:1;options[(i+direction+options.length)%options.length].click()}
-  const tab=event.target.closest('[role="tab"]');if(tab&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();const options=[...tab.parentElement.querySelectorAll('[role="tab"]')],i=options.indexOf(tab),n=(i+(event.key==='ArrowLeft'?-1:1)+options.length)%options.length;options[n].click();(dialog.open?dialog:content).querySelectorAll('[role="tab"]')[n]?.focus()}
+  // 单选组与标签组：方向键在组内移动并选中，焦点跟随新选中项；点击会重新渲染，按分组名称重新找到节点
+  const item=event.target.closest('[role="radio"],[role="tab"]'),role=item?.getAttribute('role'),step={ArrowLeft:-1,ArrowRight:1,...(role==='radio'?{ArrowUp:-1,ArrowDown:1}:{})}[event.key];
+  if(item&&step){event.preventDefault();const label=item.parentElement.getAttribute('aria-label'),options=[...item.parentElement.querySelectorAll(`[role="${role}"]`)],n=(options.indexOf(item)+step+options.length)%options.length;options[n].click();const group=document.querySelector(`[aria-label="${label}"]`);if(!group)throw new Error('方向键切换后找不到分组：'+label);group.querySelectorAll(`[role="${role}"]`)[n].focus()}
  });
  document.addEventListener('dragover',event=>{if(event.target.closest('#dropzone')){event.preventDefault();$('dropzone').classList.add('dragging')}});
  document.addEventListener('dragleave',event=>{if(event.target.closest('#dropzone'))$('dropzone')?.classList.remove('dragging')});

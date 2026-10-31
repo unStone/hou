@@ -1,0 +1,5 @@
+# scripts/ 下 Python 脚本的依赖：pip install -r scripts/requirements.txt
+# brand_compose.py
+Pillow==10.4.0
+# components/build.py（使用本机安装的 Google Chrome，无需 playwright install）
+playwright==1.49.1

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>组件展示窗口 · 厚 Hou</title>
+<link rel="icon" href="../../brand/icon/hou-icon-master.png">
+<script>
+  // 展示窗口内任何脚本错误都回报给目录页，由目录页显示失败原因与重试入口
+  addEventListener('error', event => {
+    const frame = new URLSearchParams(location.search).get('frame');
+    parent.postMessage({ type: 'hou-frame', frame, error: event.message || '资源加载失败' }, location.origin);
+  });
+</script>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body{min-height:0}
+  /* 舞台是浮层的容纳块：fixed 定位的面板、遮罩与轻提示都相对舞台排布 */
+  #stage{position:relative;transform:translateZ(0);padding:24px;min-height:80px}
+  /* 展示窗口高度随内容变化，浮层按视口高度设的上限会把内容压进滚动区，这里取消上限以展示完整内容 */
+  #stage dialog,#stage .menu-panel{max-height:none}
+  #stage dialog{position:relative;margin:0 auto}
+  #stage .toast{left:50%}
+  .cmp-sidebar{position:static;height:auto;border:0;padding:0;background:transparent}
+  /* 对话框场景：模拟 dialog::backdrop 的遮罩（与 styles.css 中 dialog::backdrop 取值一致），铺满整个舞台 */
+  .cmp-backdrop{margin:-24px;padding:24px 16px;background:color-mix(in srgb,var(--ink) 30%,transparent)}
+  .cmp-backdrop:not([hidden]){animation:fade-in var(--duration) var(--ease)}
+  .cmp-backdrop[data-leaving=true]{animation:fade-out var(--fast) var(--ease) forwards}
+  .cmp-replay{margin-top:16px}
+  .cmp-demo-note{position:fixed;right:8px;bottom:8px;z-index:80;max-width:calc(100% - 16px);padding:4px 10px;border:1px dashed var(--muted);border-radius:4px;background:var(--surface);color:var(--muted);font-size:12px;line-height:1.6}
+  .cmp-demo-note:not([hidden]){animation:appear var(--duration) var(--ease)}
+  .cmp-demo-note[data-leaving=true]{animation:fade-out var(--fast) var(--ease) forwards}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="cmp-demo-note" id="demo-note" role="status" hidden></div>
+<script src="../import-file.js"></script>
+<script src="data.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>
