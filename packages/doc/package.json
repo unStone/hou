@@ -1,0 +1,20 @@
+{
+  "name": "@hou/doc",
+  "version": "0.1.0",
+  "description": "《厚》的统一阅读格式：格式定义、校验、原文定位与各来源转换",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "linkedom": "0.18.12",
+    "typescript": "5.9.3"
+  }
+}
