@@ -83,6 +83,49 @@
   H.state.tasks.filter(t=>t.book===id&&!t.relevanceManual).forEach(t=>Object.assign(t,relevanceOf(book.goal,t.title,t.description)));
   H.closeModal();H.render();H.toast(first?'阅读目标已保存，开始读吧。':had?'阅读目标已更新。知识点的相关程度已重新评估，已有考察记录不变。':'阅读目标已保存。已有知识点按目标标注了相关程度。');
  };
+ // —— 划词：选区换算成"段落编号 + 字符位置"，与统一阅读格式的原文定位一致 ——
+ const chapterKey=()=>`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;
+ const offsetIn=(p,node,off)=>{const r=document.createRange();r.selectNodeContents(p);r.setEnd(node,off);return r.toString().length};
+ const toolbarAt=rect=>{const box=content.querySelector('.reader-content').getBoundingClientRect();return {top:Math.max(0,Math.round(rect.top-box.top-48)),left:Math.round(Math.min(Math.max(rect.left-box.left+rect.width/2,150),box.width-150))}};
+ const readSelection=()=>{
+  const sel=getSelection(),root=$('reader-text');if(!root||!sel?.rangeCount||sel.isCollapsed)return null;
+  const range=sel.getRangeAt(0);if(!range.intersectsNode(root))return null;
+  const segments=[...root.querySelectorAll('[data-paragraph]')].filter(p=>range.intersectsNode(p)).map(p=>({p:Number(p.dataset.paragraph),start:p.contains(range.startContainer)?offsetIn(p,range.startContainer,range.startOffset):0,end:p.contains(range.endContainer)?offsetIn(p,range.endContainer,range.endOffset):p.textContent.length})).filter(g=>g.end>g.start);
+  const section=H.book(H.state.bookId).sections[H.book(H.state.bookId).chapter],quote=segments.map(g=>section.text[g.p].slice(g.start,g.end)).join('\n');
+  return quote.trim()?{segments,quote,rect:range.getBoundingClientRect()}:null;
+ };
+ const findMark=id=>{for(const [key,list] of Object.entries(H.state.marks)){const m=list.find(x=>x.id===id);if(m)return {key,m}}throw new Error('找不到高亮：'+id)};
+ const markQuote=(key,m)=>{const [id,ch]=key.split(':');return H.book(id).sections[Number(ch)].text[m.p].slice(m.start,m.end)};
+ // 新高亮与同段已有高亮重叠时合并为一处，批注合并保留；跨段选区每段各记一处，批注挂在第一段
+ const addMarks=(key,segments,note)=>{
+  let list=H.state.marks[key]||[];
+  segments.forEach((g,i)=>{const hit=list.filter(m=>m.p===g.p&&m.start<g.end&&g.start<m.end);list=list.filter(m=>!hit.includes(m));list.push({id:crypto.randomUUID(),p:g.p,start:Math.min(g.start,...hit.map(m=>m.start)),end:Math.max(g.end,...hit.map(m=>m.end)),note:[...hit.map(m=>m.note),i===0?note:''].filter(Boolean).join('\n\n')})});
+  H.state.marks[key]=list;
+ };
+ // 渲染后量一下功能栏，超出窗口时往里挪，离边缘至少 8px
+ const fitToolbar=()=>{const tb=$('sel-toolbar');if(!tb)return;const r=tb.getBoundingClientRect(),vw=document.documentElement.clientWidth,dx=r.right>vw-8?vw-8-r.right:r.left<8?8-r.left:0;if(dx){H.state.selTool.left+=Math.round(dx);tb.style.left=`${H.state.selTool.left}px`}};
+ const selectionEnd=event=>{
+  if(H.state.route!=='reader'||event.target.closest?.('#sel-toolbar,.ask-panel,dialog'))return;
+  const found=readSelection();
+  if(found){H.state.selTool={mode:'new',segments:found.segments,quote:found.quote,...toolbarAt(found.rect)};getSelection().removeAllRanges();H.render();fitToolbar();return}
+  const el=event.target.closest?.('mark.hl');
+  if(el){const {key,m}=findMark(el.dataset.mark);H.state.selTool={mode:'mark',id:m.id,note:m.note,segments:[{p:m.p,start:m.start,end:m.end}],quote:markQuote(key,m),...toolbarAt(el.getBoundingClientRect())};H.render();fitToolbar();return}
+  if(H.state.selTool){H.state.selTool=null;H.render()}
+ };
+ // 本地示例回答：按问题类型套用模板，"和阅读目标的关系"按目标里的词是否出现在选中文字中判断。真实回答由模型基于原文生成
+ const answer=q=>{
+  const a=H.state.ask,book=H.book(a.bookId),section=book.sections[Number(a.key.split(':')[1])],para=section.text[a.segments[0].p];
+  const target=book.goal?(book.goal.learn||book.goal.gain):'';
+  if(q==='解释这段')return `这段出自「${section.title}」。它所在的段落是：“${para.length>90?para.slice(0,90)+'…':para}” 真实回答会由模型用更直白的话重述这段，并说明它在本章里起什么作用。`;
+  if(q==='举个例子')return `真实回答会由模型结合原文构造一个具体场景${target?`，优先贴近你的阅读目标“${target}”`:''}，并标明哪些内容是原文之外的补充。`;
+  if(q==='和我的阅读目标有什么关系'){const words=target.split(/[，,、。；;\s]+/).filter(w=>w.length>=2),hits=words.filter(w=>a.quote.includes(w));return hits.length?`有直接关系。你想学会的「${hits.join('、')}」就在这段里，建议细读；读完本章后，相关知识点会优先考察。`:`关系不大。这段没有直接写到你想学会的「${target}」，可以先读过去，不影响理解目标相关的部分。`}
+  return `原型无法回答自由提问。连接模型后，会结合这段文字、所在段落、本章原文和你的阅读目标，回答：“${q}”`;
+ };
+ const askSend=text=>{
+  const a=H.state.ask;if(!text||a.loading)return;
+  a.messages.push({role:'user',text});a.loading=true;a.draft='';H.render();
+  setTimeout(()=>{if(H.state.ask!==a)return;a.messages.push({role:'ai',text:answer(text)});a.loading=false;H.render();const log=$('ask-log');if(log)log.scrollTop=log.scrollHeight},700);
+ };
  const extract=()=>{
   const book=H.book(H.state.bookId),section=book.sections[book.chapter],key=`${book.id}:${book.chapter}`;
   H.state.extraction={book:book.id,section:book.chapter,loading:true,points:[]};H.go('extract');const token=++generation;
@@ -110,7 +153,16 @@
   start:el=>{H.closePanel();H.start(el.dataset.id)},claim,'queue':queue,'close-panel':()=>{H.closePanel();$('queue-button').focus()},'close-toast':()=>{clearTimeout(toastTimer);leave($('toast'),()=>{$('toast').hidden=true})},'close-modal':H.closeModal,
   'claim-library':()=>{H.closeModal();H.go('library')},filter:el=>{H.state.filter=el.dataset.value;H.render()},
   read:el=>{if(el.dataset.id)H.state.bookId=el.dataset.id;H.state.sourceReturn=false;H.go('reader')},'continue-reading':()=>{const id=$('mini-title').dataset.id;if(!id){showImport('file');return}H.state.bookId=id;H.state.sourceReturn=false;H.go('reader')},
-  chapter:el=>{H.book(H.state.bookId).chapter=Number(el.dataset.index);H.state.sourceReturn=false;H.render(true)},
+  chapter:el=>{H.book(H.state.bookId).chapter=Number(el.dataset.index);H.state.sourceReturn=false;H.state.selTool=null;H.render(true)},
+  'sel-highlight':()=>{const t=H.state.selTool;addMarks(chapterKey(),t.segments,'');H.state.selTool=null;H.render();H.toast(t.segments.length>1?`已高亮，跨 ${t.segments.length} 段分别记录。`:'已高亮。')},
+  'sel-unmark':()=>{const {key,m}=findMark(H.state.selTool.id);H.state.marks[key]=H.state.marks[key].filter(x=>x!==m);H.state.selTool=null;H.render();H.toast(m.note?'已取消高亮，批注一并删除。':'已取消高亮。')},
+  'sel-note':()=>{const t=H.state.selTool;H.modal(modalHead(t.mode==='mark'&&t.note?'批注':'写批注')+`<blockquote class="ask-quote">${e(t.quote)}</blockquote><div class="form-field"><label for="mark-note">你的想法</label><textarea id="mark-note" rows="3" placeholder="写下联系、疑问，或自己的理解。">${e(t.note||'')}</textarea><span class="caption">批注会挂在这段文字的高亮上。</span></div><div class="form-actions">${b('保存批注','save-mark-note','primary')}</div>`)},
+  'save-mark-note':()=>{const t=H.state.selTool,text=$('mark-note').value.trim();if(t.mode==='mark')findMark(t.id).m.note=text;else addMarks(chapterKey(),t.segments,text);H.state.selTool=null;H.closeModal();H.render();H.toast(text?'批注已保存，这段文字已高亮。':'已高亮，没有写批注。')},
+  'sel-copy':()=>{const t=H.state.selTool;H.state.selTool=null;H.render();(navigator.clipboard?.writeText(t.quote)??Promise.reject()).then(()=>H.toast('已复制。'),()=>H.toast('浏览器不允许复制，请手动复制。'))},
+  'sel-ask':()=>{const t=H.state.selTool;H.state.ask={bookId:H.state.bookId,key:chapterKey(),segments:t.segments,quote:t.quote,messages:[],loading:false,draft:''};H.state.selTool=null;H.render();requestAnimationFrame(()=>$('ask-input')?.focus())},
+  'ask-preset':el=>askSend(el.dataset.value),'ask-send':()=>askSend($('ask-input').value.trim()),'ask-close':()=>{H.state.ask=null;H.render()},
+  'ask-save':el=>{const a=H.state.ask,i=Number(el.dataset.index);addMarks(a.key,a.segments,`问：${a.messages[i-1].text}\n答：${a.messages[i].text}`);a.messages[i].saved=true;H.render();H.toast('回答已存为批注。')},
+  'goto-mark':el=>{const node=content.querySelector(`mark[data-mark="${CSS.escape(el.dataset.id)}"]`);if(!node)return;node.scrollIntoView({block:'center',behavior:H.state.reduceMotion?'auto':'smooth'});node.classList.add('flash');setTimeout(()=>node.classList.remove('flash'),1200)},
   'book-detail':el=>{H.state.bookId=el.dataset.id;H.go('book-detail')},
   'book-menu':el=>{const book=H.book(el.dataset.id);H.modal(modalHead(book.title)+`<div class="od-stack gap-16">${b('查看章节与掌握程度','modal-book-detail','secondary',`data-id="${e(book.id)}"`)}${b(book.paused?'恢复考察':'暂停考察','pause-book','secondary',`data-id="${e(book.id)}"`)}${b(book.goal?'修改阅读目标':'写下阅读目标','modal-goal','secondary',`data-id="${e(book.id)}"`)}${b('放弃这'+(book.kind==='book'?'本':'篇'),'abandon','text-button',`data-id="${e(book.id)}"`)}</div>`)},'modal-goal':el=>goalModal(el.dataset.id,false),
   'modal-book-detail':el=>{H.closeModal();actions['book-detail'](el)},
@@ -128,7 +180,6 @@
   import:()=>showImport(H.slot('book')&&!H.slot('article')?'text':'file'),'import-kind':el=>showImport(el.dataset.value==='book'?'file':'text'),'quota-read':el=>{H.closeModal();actions.read(el)},'import-tab':el=>showImport(el.dataset.value),
   'import-web':()=>{const input=$('import-url'),value=input.value.trim();let url;try{url=new URL(value)}catch{importError('请填写完整的网页链接，例如 https://example.com/article。');return}if(!['https:','http:'].includes(url.protocol)){importError('网页链接必须使用 http 或 https。');return}importError('当前原型没有接入网页正文提取，无法抓取这个链接。请切换到“正文”，粘贴文章内容后导入。')},
   'import-text':()=>{const title=$('import-title').value.trim(),text=$('import-text').value.trim();if(!title||!text){importError(!title?'请填写内容标题。':'请粘贴正文后再导入。');return}const id=crypto.randomUUID();if(H.slot('article')){showImport('text');return}H.state.books.push({id,title,type:'正文',kind:'article',status:'reading',goal:null,goalHistory:[],author:'你导入的内容',description:'来自粘贴的正文。',chapter:0,paused:false,archived:false,sections:[{title:'全文',text:text.split(/\n\s*\n|\n/).filter(Boolean)}]});H.state.bookId=id;H.state.sourceReturn=false;H.go('reader');goalModal(id,true)},
-  highlight:()=>{const selection=window.getSelection(),key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;let node=selection?.anchorNode;if(node?.nodeType===Node.TEXT_NODE)node=node.parentElement;const p=node?.closest?.('[data-paragraph]');if(!p||!$('reader-text').contains(p)||!selection.toString().trim()){H.toast('请先用鼠标选中阅读正文中的一段文字。');return}const index=Number(p.dataset.paragraph),marks=H.state.marks[key]||[];H.state.marks[key]=marks.includes(index)?marks.filter(n=>n!==index):[...marks,index];selection.removeAllRanges();H.render();H.toast(marks.includes(index)?'已取消该段高亮。':'已高亮整段原文，作为考察侧重的参考。')},
   annotation:()=>{const key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;H.modal(modalHead('留下一点想法')+`<div class="form-field"><label for="note-text">本章批注</label><textarea id="note-text" placeholder="写下联系、疑问，或自己的理解。">${e(H.state.notes[key]||'')}</textarea></div><div class="form-actions">${b('保存批注','save-note','primary')}</div>`)},
   'save-note':()=>{const key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;H.state.notes[key]=$('note-text').value.trim();H.closeModal();H.render();H.toast('批注已保存在本次会话。')},
   'extract-start':extract,'toggle-point':el=>{const p=H.state.extraction.points[Number(el.dataset.index)];p.removed=!p.removed;H.render()},'confirm-extraction':confirmExtraction,
@@ -156,7 +207,8 @@
  document.addEventListener('focusout',event=>{if(event.target.id==='import-title'&&!event.target.value.trim()){importError('请填写内容标题。')}if(event.target.id==='import-text'&&!event.target.value.trim()){importError('请粘贴正文后再导入。')}});
  document.addEventListener('keydown',event=>{
   if(event.target.id==='shortcut-input'){event.preventDefault();if((event.metaKey||event.ctrlKey)&&/^[a-z]$/i.test(event.key))event.target.value=[event.metaKey?'⌘':'Ctrl',event.shiftKey?'⇧':'',event.altKey?'⌥':'',event.key.toUpperCase()].filter(Boolean).join(' ');return}
-  if(event.key==='Escape'){if(dialog.open){event.preventDefault();H.closeModal();return}if(!$('queue-overlay').hidden){H.closePanel();$('queue-button').focus();return}if(H.state.route==='game')actions['exit-game']();return}
+  if(event.key==='Enter'&&!event.shiftKey&&event.target.id==='ask-input'&&!event.isComposing){event.preventDefault();actions['ask-send']();return}
+  if(event.key==='Escape'){if(dialog.open){event.preventDefault();H.closeModal();return}if(H.state.selTool){H.state.selTool=null;H.render();return}if(!$('queue-overlay').hidden){H.closePanel();$('queue-button').focus();return}if(H.state.route==='game')actions['exit-game']();return}
   if(event.key==='Enter'&&event.target.id==='import-title'){event.preventDefault();actions['import-text']();return}
   if(event.key==='Enter'&&event.target.id==='import-url'){event.preventDefault();actions['import-web']();return}
   if((event.metaKey||event.ctrlKey)&&!dialog.open&&!['INPUT','TEXTAREA'].includes(event.target.tagName)){const c=H.state.config.shortcut,match=c.endsWith(event.key.toUpperCase())&&c.includes('⇧')===event.shiftKey&&c.includes('⌥')===event.altKey;if(match){event.preventDefault();if(H.state.route!=='game')claim()}}
@@ -169,6 +221,13 @@
  document.addEventListener('drop',event=>{if(event.target.closest('#dropzone')){event.preventDefault();$('dropzone').classList.remove('dragging');fileSelected(event.dataTransfer.files[0])}});
  // 记住阅读目标面板的展开状态，同页重新渲染时不收起
  document.addEventListener('toggle',event=>{if(event.target.classList?.contains('goal-panel'))H.state.goalOpen=event.target.open},true);
+ document.addEventListener('mouseup',selectionEnd);
+ // 触屏上长按选字后没有 mouseup，等选区稳定后再读取
+ document.addEventListener('touchend',event=>setTimeout(()=>selectionEnd(event),350));
+ document.addEventListener('keyup',event=>{if(event.shiftKey&&event.key.startsWith('Arrow'))selectionEnd(event)});
+ // 点功能栏按钮时不要让选区消失
+ document.addEventListener('mousedown',event=>{if(event.target.closest('#sel-toolbar'))event.preventDefault()});
+ document.addEventListener('input',event=>{if(event.target.id==='ask-input'&&H.state.ask)H.state.ask.draft=event.target.value});
  dialog.addEventListener('cancel',event=>{event.preventDefault();H.closeModal()});
  $('queue-overlay').addEventListener('click',event=>{if(event.target===$('queue-overlay')){H.closePanel();$('queue-button').focus()}});
  $('queue-overlay').addEventListener('keydown',event=>{if(event.key!=='Tab')return;const nodes=[...$('queue-body').querySelectorAll('button')],first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}});
