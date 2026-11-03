@@ -1,12 +1,12 @@
 (() => {
  const H=window.Hou,e=H.e,b=H.button,icon=H.icon;
- H.state={books:structuredClone(HouData.books),tasks:structuredClone(HouData.tasks),route:'today',bookId:'prd',filter:'active',completed:[],marks:{},notes:{},records:[],theme:'light',reduceMotion:false,sourceReturn:false,recordId:null,config:{url:'',model:'',shortcut:'⌘ ⇧ H',scheduled:false,time:'09:30'}};
+ H.state={books:structuredClone(HouData.books),tasks:structuredClone(HouData.tasks),route:'today',bookId:'prd',filter:'active',completed:[],marks:{},notes:{},records:[],theme:'light',reduceMotion:false,sourceReturn:false,recordId:null,goalOpen:false,config:{url:'',model:'',shortcut:'⌘ ⇧ H',scheduled:false,time:'09:30',oldReview:true}};
  const $=id=>document.getElementById(id);
  const content=$('content'),dialog=$('dialog');
  let timer=null,toastTimer=null,lastFocus=null,importMode='file',generation=0,renderedRoute=null;
  H.toast=message=>{clearTimeout(toastTimer);const toast=$('toast');enter(toast);$('toast-text').textContent=message;toast.hidden=false;toastTimer=setTimeout(()=>leave(toast,()=>{toast.hidden=true}),6000)};
  H.render=(focus=false)=>{
-  const s=H.state,views={today:H.today,library:H.library,reader:H.reader,extract:H.extract,game:H.game,result:H.result,settings:H.settings,records:H.records,log:H.log,schedule:H.schedule,'book-detail':H.bookDetail};
+  const s=H.state,views={today:H.today,library:H.library,reader:H.reader,extract:H.extract,game:H.game,result:H.result,settings:H.settings,records:H.records,log:H.log,schedule:H.schedule,'book-detail':H.bookDetail,review:H.review};
   if(!views[s.route])throw new Error(`无法显示页面：${s.route}`);
   // 同一页面内的状态变化用 morph 保留原有节点，选中、开关等过渡动画才能播放；切换页面时整页替换以播放页面淡入
   if(s.route===renderedRoute)Idiomorph.morph(content,views[s.route](),{morphStyle:'innerHTML'});
@@ -18,10 +18,11 @@
   $('brand-icon').src=`../brand/icon/hou-icon-master${s.theme==='dark'?'-dark':''}.png`;
   $('theme-label').textContent=s.theme==='dark'?'浅色外观':'深色外观';
   $('theme-glyph').innerHTML=icon(s.theme==='dark'?'sun':'moon');
-  const names={today:'今天',library:'内容库',reader:'阅读',extract:'知识点',game:'考察',result:'理解反馈',settings:'设置',records:'运行记录',log:'记录详情',schedule:'接下来的安排','book-detail':'掌握程度'};
+  const names={today:'今天',library:'内容库',reader:'阅读',extract:'知识点',game:'考察',result:'理解反馈',settings:'设置',records:'运行记录',log:'记录详情',schedule:'接下来的安排','book-detail':'掌握程度',review:'回顾'};
   $('crumb-current').textContent=names[s.route];document.title=`${names[s.route]} · 厚 Hou`;$('queue-count').textContent=H.pending().length;$('nav-count').textContent=String(H.pending().length).padStart(2,'0');
-  document.querySelectorAll('[data-nav]').forEach(node=>{const key=node.dataset.nav,active=key===s.route||(key==='library'&&['reader','extract','book-detail'].includes(s.route))||(key==='records'&&s.route==='log');if(active)node.setAttribute('aria-current','page');else node.removeAttribute('aria-current')});
-  const current=H.book(s.bookId);$('mini-title').textContent=current.title;$('mini-chapter').textContent=current.sections[current.chapter].title;$('mini-progress').style.width=`${((current.chapter+1)/current.sections.length)*100}%`;
+  document.querySelectorAll('[data-nav]').forEach(node=>{const key=node.dataset.nav,active=key===s.route||(key==='library'&&['reader','extract','book-detail','review'].includes(s.route))||(key==='records'&&s.route==='log');if(active)node.setAttribute('aria-current','page');else node.removeAttribute('aria-current')});
+  // 侧栏只显示在读的内容：当前打开的若已归档，改显示在读的书或文章
+  const opened=H.book(s.bookId),current=opened?.status==='reading'?opened:H.slot('book')||H.slot('article');$('mini-title').textContent=current?current.title:'现在没有在读的内容';$('mini-title').dataset.id=current?.id||'';$('mini-chapter').textContent=current?current.sections[current.chapter].title:'导入一本书或一篇文章';$('mini-progress').style.width=current?`${((current.chapter+1)/current.sections.length)*100}%`:'0';
   if(focus){window.scrollTo(0,0);requestAnimationFrame(()=>{const target=content.querySelector('h1');if(target)target.focus({preventScroll:true})})}
  };
  H.go=route=>{H.closePanel();H.state.route=route;H.render(true)};
@@ -37,7 +38,7 @@
  const addRecord=values=>{const r={id:crypto.randomUUID(),...timestamp(),...values};H.state.records.push(r);H.state.recordId=r.id;return r};
  const saveGameNote=()=>{const textarea=$('explanation');if(textarea&&H.state.game&&!H.state.game.readonly)H.state.game.notes[H.state.game.step]=textarea.value};
  H.start=(id,trigger='从今天页开始')=>{
-  const t=task(id);if(H.book(t.book).paused||H.book(t.book).archived){H.toast('这份内容的考察已暂停，请先恢复。');return}
+  const t=task(id),owner=H.book(t.book);if(!H.active(owner)){H.toast(owner.paused?'这份内容的考察已暂停，请先恢复。':'“旧书复习”已关闭，归档内容不再出题。');return}
   const section=H.book(t.book).sections[t.section];
   let questions;
   if(t.id==='t3')questions=[{question:'小游戏结束时，哪一项是判断理解程度所必需的？',choices:['用户的操作过程与最终作答','动画播放次数','游戏的视觉丰富程度'],correct:0,explanation:'游戏必须产出操作过程、最终作答和完成状态，才能为后续判断提供依据。'},{question:'替换游戏生成方式时，什么应该保持稳定？',choices:['所有游戏使用同一视觉样式','固定输入与作答输出的约定','每次游戏的具体题目'],correct:1,explanation:'生成方式可插拔，组件通过固定的输入输出交互，不影响判断和计划。'}];
@@ -52,22 +53,45 @@
   importMode=mode;
   const tabs=`<div class="tabs" role="tablist" aria-label="导入方式">${['file','web','text'].map((v,i)=>b(['文件','网页','正文'][i],'import-tab','',`data-value="${v}" role="tab" aria-selected="${mode===v}" tabindex="${mode===v?0:-1}"`)).join('')}</div>`;
   const forms={file:`<div class="dropzone" id="dropzone">${icon('upload')}<div class="od-field"><strong>拖入一本书，慢慢读。</strong><span class="caption">PDF / EPUB</span></div><input id="file-input" class="sr-only" type="file" accept=".pdf,.epub" aria-describedby="file-note"><label for="file-input" class="secondary">选择本地文件</label></div><p class="caption" id="file-note">当前原型未接入 PDF / EPUB 正文解析。选择文件可查看导入状态；使用“正文”可完整体验阅读流程。</p>`,web:`<div class="form-field"><label for="import-url">网页链接</label><input id="import-url" type="url" placeholder="https://…"></div><p class="caption">原型不抓取外部网页。尝试导入后可以改为粘贴正文。</p><div class="form-actions">${b('导入网页','import-web','primary')}</div>`,text:`<div class="form-field"><label for="import-title">内容标题</label><input id="import-title" placeholder="为这份内容起一个名字" maxlength="120"></div><div class="form-field"><label for="import-text">正文</label><textarea id="import-text" placeholder="粘贴你准备阅读的正文…" rows="8"></textarea><span class="caption">整篇作为一个章节保留，仅用于当前会话。</span></div><div class="form-actions">${b('导入并阅读','import-text','primary')}</div>`};
-  const html=modalHead('导入内容')+tabs+forms[mode]+'<div id="import-error" class="error" role="alert" hidden></div>';
+  // 导入即在读：同类的在读名额已占用时，不显示导入表单
+  const kind=mode==='file'?'book':'article',held=H.slot(kind),name=H.kinds[kind].name;
+  const blocked=held&&`<div class="quota-block"><span class="caption">${name}的在读名额 · 1 / 1</span><h3>${e(held.title)} · 还没读完</h3><p class="muted">没有待读列表：导入就是开始读。先把这${kind==='book'?'本':'篇'}读完，或者写下理由放弃，才能导入新的${name}。</p><div class="form-actions">${b('放弃这'+(kind==='book'?'本':'篇'),'abandon','text-button',`data-id="${e(held.id)}"`)}${b('继续读 '+icon('arrow'),'quota-read','primary',`data-id="${e(held.id)}"`)}</div></div>`;
+  const html=modalHead('导入内容')+tabs+(blocked||forms[mode])+'<div id="import-error" class="error" role="alert" hidden></div>';
   if(dialog.open){$('dialog-body').innerHTML=html;dialog.querySelector('[role="tab"][aria-selected="true"]').focus()}else H.modal(html);
  };
  const importError=message=>{const target=$('import-error');target.textContent=message;target.hidden=false};
  const fileSelected=file=>{if(file)importError(HouImport.fileMessage(file.name))};
  const dateOption=(label,timeValue)=>b(label,'apply-delay','secondary',`data-value="${timeValue}"`);
  const showDelay=id=>{H.state.delayId=id;const t=task(id);H.modal(modalHead('稍后，再继续。')+`<p class="muted">${e(t.title)}</p><div class="od-stack gap-16" style="margin-top:24px">${dateOption('一小时后','一小时后')}${dateOption('今天晚上 · 20:00','今天 · 20:00')}${dateOption('明天早上 · 09:30','明天 · 09:30')}</div><p class="footnote">本地示例仅更新安排，不触发系统通知。</p>`) };
+ const today=()=>{const d=new Date();return `${d.getMonth()+1} 月 ${d.getDate()} 日`};
+ // 本地示例的相关程度：知识点里出现"想学会"中的词为高，只出现词的前两个字为中，否则为低。真实版本由模型判断
+ const relevanceOf=(goal,title,text)=>{
+  const words=(goal.learn||goal.gain).split(/[，,、。；;\s“”"'·/]+/).filter(w=>w.length>=2),all=title+text;
+  const hit=words.find(w=>all.includes(w));if(hit)return {relevance:'high',relevanceReason:`目标里写了“${hit}”。`};
+  const near=words.find(w=>all.includes(w.slice(0,2)));if(near)return {relevance:'mid',relevanceReason:`与目标中的“${near}”有关。`};
+  return {relevance:'low',relevanceReason:'没有直接对应目标，仍会保留复习。'};
+ };
+ const goalModal=(id,first)=>{
+  const book=H.book(id),g=book.goal||{gain:'',learn:''},unit=book.kind==='book'?'本书':'篇文章';
+  H.modal(modalHead(first?'开始读之前':'阅读目标')+`<p class="muted">${first?`${e(book.title)} 已导入，现在就是在读。`:''}想清楚要从这${unit}里拿走什么，知识点会按目标排序，考察也会从目标场景出题。可以只写一项。</p><div class="form-field"><label for="goal-gain">想从这${unit}得到什么</label><textarea id="goal-gain" rows="2" placeholder="例如：弄清楚好界面背后的原则，能说出为什么好。">${e(g.gain)}</textarea></div><div class="form-field"><label for="goal-learn">想学会哪些内容</label><textarea id="goal-learn" rows="2" placeholder="例如：信息层次、留白、一屏只突出一件事">${e(g.learn)}</textarea><span class="caption">用顿号或逗号分开。</span></div>${book.goalHistory.length?`<details><summary>之前的目标 · ${book.goalHistory.length} 条</summary>${book.goalHistory.map(h=>`<p class="caption">截至 ${e(h.until)}：${e(h.learn||h.gain)}</p>`).join('')}</details>`:''}<p id="goal-error" class="field-error" role="alert" hidden></p><div class="form-actions">${b(first?'先跳过':'取消',first?'skip-goal':'close-modal','text-button')}${b('保存目标','save-goal','primary',`data-id="${e(id)}" data-first="${first}"`)}</div>`);
+ };
+ const saveGoal=(id,first)=>{
+  const book=H.book(id),gain=$('goal-gain').value.trim(),learn=$('goal-learn').value.trim();
+  if(!gain&&!learn){$('goal-error').textContent='至少写一项；不想写可以先跳过。';$('goal-error').hidden=false;return}
+  const had=!!book.goal;if(book.goal&&(book.goal.gain!==gain||book.goal.learn!==learn))book.goalHistory.push({...book.goal,until:today()});
+  book.goal={gain,learn};
+  H.state.tasks.filter(t=>t.book===id&&!t.relevanceManual).forEach(t=>Object.assign(t,relevanceOf(book.goal,t.title,t.description)));
+  H.closeModal();H.render();H.toast(first?'阅读目标已保存，开始读吧。':had?'阅读目标已更新。知识点的相关程度已重新评估，已有考察记录不变。':'阅读目标已保存。已有知识点按目标标注了相关程度。');
+ };
  const extract=()=>{
   const book=H.book(H.state.bookId),section=book.sections[book.chapter],key=`${book.id}:${book.chapter}`;
   H.state.extraction={book:book.id,section:book.chapter,loading:true,points:[]};H.go('extract');const token=++generation;
-  clearTimeout(timer);timer=setTimeout(()=>{if(token!==generation||H.state.route!=='extract')return;const existing=H.state.tasks.filter(t=>t.book===book.id&&t.section===book.chapter);H.state.extraction.points=existing.length?existing.map(t=>({title:t.title,text:t.description,removed:false})):section.text.slice(0,3).map((p,i)=>({title:section.text.length===1?section.title:`${section.title} · 要点 ${i+1}`,text:p,removed:false}));H.state.extraction.loading=false;H.render(true)},900);
+  clearTimeout(timer);timer=setTimeout(()=>{if(token!==generation||H.state.route!=='extract')return;const existing=H.state.tasks.filter(t=>t.book===book.id&&t.section===book.chapter);const points=existing.length?existing.map(t=>({title:t.title,text:t.description,removed:false,relevance:t.relevance,relevanceReason:t.relevanceReason,manual:t.relevanceManual})):section.text.slice(0,3).map((p,i)=>({title:section.text.length===1?section.title:`${section.title} · 要点 ${i+1}`,text:p,removed:false}));if(book.goal){const order={high:0,mid:1,low:2};points.forEach(p=>{if(!p.relevance)Object.assign(p,relevanceOf(book.goal,p.title,p.text))});points.sort((a,b)=>order[a.relevance]-order[b.relevance])}H.state.extraction.points=points;H.state.extraction.loading=false;H.render(true)},900);
  };
  const confirmExtraction=()=>{
   const x=H.state.extraction,kept=x.points.filter(p=>!p.removed),key=`${x.book}:${x.section}`;
   if(!H.state.completed.includes(key))H.state.completed.push(key);
-  x.points.forEach(p=>{const existing=H.state.tasks.find(t=>t.book===x.book&&t.section===x.section&&t.title===p.title);if(existing&&p.removed)existing.status='excluded';else if(existing&&existing.status==='excluded')existing.status='pending';else if(!existing&&!p.removed)H.state.tasks.push({id:crypto.randomUUID(),book:x.book,section:x.section,title:p.title,description:p.text,level:'理解',minutes:3,status:'pending',mastery:1,reason:'章节读完后，首次从基础识别开始考察。',custom:true})});
+  x.points.forEach(p=>{const existing=H.state.tasks.find(t=>t.book===x.book&&t.section===x.section&&t.title===p.title);const rel=p.relevance?{relevance:p.relevance,relevanceReason:p.relevanceReason,relevanceManual:!!p.manual}:{};if(existing)Object.assign(existing,rel);if(existing&&p.removed)existing.status='excluded';else if(existing&&existing.status==='excluded')existing.status='pending';else if(!existing&&!p.removed)H.state.tasks.push({id:crypto.randomUUID(),book:x.book,section:x.section,title:p.title,description:p.text,level:'理解',minutes:3,status:'pending',mastery:1,reason:p.relevance==='high'?'与阅读目标高度相关，优先安排首次考察。':'章节读完后，首次从基础识别开始考察。',custom:true,...rel})});
   H.go('today');H.toast(kept.length?`已保留 ${kept.length} 个知识点。首次示例考察已加入待完成。`:'未保留知识点，本章节已标记读完。');
  };
  const finishGame=()=>{
@@ -85,17 +109,25 @@
   today:()=>H.go('today'),library:()=>H.go('library'),settings:()=>H.go('settings'),records:()=>H.go('records'),schedule:()=>H.go('schedule'),reader:()=>H.go('reader'),
   start:el=>{H.closePanel();H.start(el.dataset.id)},claim,'queue':queue,'close-panel':()=>{H.closePanel();$('queue-button').focus()},'close-toast':()=>{clearTimeout(toastTimer);leave($('toast'),()=>{$('toast').hidden=true})},'close-modal':H.closeModal,
   'claim-library':()=>{H.closeModal();H.go('library')},filter:el=>{H.state.filter=el.dataset.value;H.render()},
-  read:el=>{if(el.dataset.id)H.state.bookId=el.dataset.id;H.state.sourceReturn=false;H.go('reader')},'continue-reading':()=>{H.state.sourceReturn=false;H.go('reader')},
+  read:el=>{if(el.dataset.id)H.state.bookId=el.dataset.id;H.state.sourceReturn=false;H.go('reader')},'continue-reading':()=>{const id=$('mini-title').dataset.id;if(!id){showImport('file');return}H.state.bookId=id;H.state.sourceReturn=false;H.go('reader')},
   chapter:el=>{H.book(H.state.bookId).chapter=Number(el.dataset.index);H.state.sourceReturn=false;H.render(true)},
   'book-detail':el=>{H.state.bookId=el.dataset.id;H.go('book-detail')},
-  'book-menu':el=>{const book=H.book(el.dataset.id);H.modal(modalHead(book.title)+`<div class="od-stack gap-16">${b('查看章节与掌握程度','modal-book-detail','secondary',`data-id="${e(book.id)}"`)}${b(book.paused?'恢复考察':'暂停考察','pause-book','secondary',`data-id="${e(book.id)}"`)}${b('归档这份内容','archive-confirm','text-button',`data-id="${e(book.id)}"`)}</div>`)},
+  'book-menu':el=>{const book=H.book(el.dataset.id);H.modal(modalHead(book.title)+`<div class="od-stack gap-16">${b('查看章节与掌握程度','modal-book-detail','secondary',`data-id="${e(book.id)}"`)}${b(book.paused?'恢复考察':'暂停考察','pause-book','secondary',`data-id="${e(book.id)}"`)}${b(book.goal?'修改阅读目标':'写下阅读目标','modal-goal','secondary',`data-id="${e(book.id)}"`)}${b('放弃这'+(book.kind==='book'?'本':'篇'),'abandon','text-button',`data-id="${e(book.id)}"`)}</div>`)},'modal-goal':el=>goalModal(el.dataset.id,false),
   'modal-book-detail':el=>{H.closeModal();actions['book-detail'](el)},
   'pause-book':el=>{const book=H.book(el.dataset.id);book.paused=!book.paused;if(dialog.open)H.closeModal();H.render();H.toast(book.paused?'考察已暂停。阅读与历史记录会保留。':'已恢复这份内容的考察安排。')},
-  'archive-confirm':el=>{const book=H.book(el.dataset.id);$('dialog-body').innerHTML=modalHead('归档这份内容？')+`<p class="archive-name">${e(book.title)}</p><p class="muted">将停止相关考察。内容、批注和历史作答记录都会保留，可以从“已归档”恢复。</p><div class="form-actions">${b('取消','close-modal','text-button')}${b('确认归档','archive-book','primary',`data-id="${e(book.id)}"`)}</div>`},
-  'archive-book':el=>{const book=H.book(el.dataset.id);book.archived=true;H.closeModal();H.render();H.toast('已归档，历史记录已保留。')},unarchive:el=>{H.book(el.dataset.id).archived=false;H.render();H.toast('已恢复到阅读中。')},
-  import:()=>showImport('file'),'import-tab':el=>showImport(el.dataset.value),
+  abandon:el=>{const book=H.book(el.dataset.id),unit=book.kind==='book'?'本':'篇';H.modal(modalHead(`放弃这${unit}？`)+`<p class="archive-name">${e(book.title)}</p><p class="muted">放弃后归档，标记为“未读完”，空出${H.kinds[book.kind].name}的在读名额。归档后不能再继续读，只能回看；已提取的知识点按“旧书复习”设置处理。</p><div class="form-field"><label for="abandon-reason">为什么不读了</label><textarea id="abandon-reason" rows="3" placeholder="例如：内容和我的目标关系不大。"></textarea><span class="caption">必填。理由会一直留在归档里。</span></div><p id="abandon-error" class="field-error" role="alert" hidden></p><div class="form-actions">${b('继续读','close-modal','text-button')}${b('确认放弃','abandon-confirm','primary',`data-id="${e(book.id)}"`)}</div>`)},
+  'abandon-confirm':el=>{const reason=$('abandon-reason').value.trim();if(!reason){$('abandon-error').textContent='请写下放弃的理由。';$('abandon-error').hidden=false;$('abandon-reason').focus();return}const book=H.book(el.dataset.id);book.status='abandoned';book.archived=true;book.abandonReason=reason;book.endedAt=today();H.closeModal();if(['reader','extract'].includes(H.state.route)&&H.state.bookId===book.id)H.go('library');else H.render();H.toast(`已放弃并归档，${H.kinds[book.kind].name}的在读名额空出来了。`)},
+  'finish-confirm':el=>{const book=H.book(el.dataset.id);H.modal(modalHead('全书读完？')+`<p class="archive-name">${e(book.title)}</p><p class="muted">读完后归档，空出${H.kinds[book.kind].name}的在读名额，并对照阅读目标做一次回顾。</p><div class="form-actions">${b('再看看','close-modal','text-button')}${b('读完，去回顾','finish-book','primary',`data-id="${e(book.id)}"`)}</div>`)},
+  'finish-book':el=>{const book=H.book(el.dataset.id);book.status='done';book.archived=true;book.endedAt=today();H.state.bookId=book.id;H.closeModal();H.go('review')},
+  review:el=>{H.state.bookId=el.dataset.id;H.go('review')},
+  'review-source':el=>{const t=task(el.dataset.id);H.state.bookId=t.book;H.book(t.book).chapter=t.section;H.state.sourceReturn=false;H.go('reader')},
+  'save-reflection':el=>{H.book(el.dataset.id).reflection=$('reflection').value.trim();H.toast('观点已保存。')},
+  goal:el=>goalModal(el.dataset.id,false),'save-goal':el=>saveGoal(el.dataset.id,el.dataset.first==='true'),'skip-goal':()=>{H.closeModal();H.toast('已导入，开始读吧。阅读器顶部随时可以写下阅读目标。')},
+  'set-relevance':el=>{const p=H.state.extraction.points[Number(el.dataset.index)];p.relevance=el.dataset.value;p.relevanceReason='由你调整。';p.manual=true;H.render()},
+  'toggle-old-review':()=>{H.state.config.oldReview=!H.state.config.oldReview;H.render();H.toast(H.state.config.oldReview?'归档内容的知识点会继续按计划出题。':'归档内容不再出题，掌握程度和记录都保留。')},
+  import:()=>showImport(H.slot('book')&&!H.slot('article')?'text':'file'),'import-kind':el=>showImport(el.dataset.value==='book'?'file':'text'),'quota-read':el=>{H.closeModal();actions.read(el)},'import-tab':el=>showImport(el.dataset.value),
   'import-web':()=>{const input=$('import-url'),value=input.value.trim();let url;try{url=new URL(value)}catch{importError('请填写完整的网页链接，例如 https://example.com/article。');return}if(!['https:','http:'].includes(url.protocol)){importError('网页链接必须使用 http 或 https。');return}importError('当前原型没有接入网页正文提取，无法抓取这个链接。请切换到“正文”，粘贴文章内容后导入。')},
-  'import-text':()=>{const title=$('import-title').value.trim(),text=$('import-text').value.trim();if(!title||!text){importError(!title?'请填写内容标题。':'请粘贴正文后再导入。');return}const id=crypto.randomUUID();H.state.books.push({id,title,type:'正文',author:'你导入的内容',description:'来自粘贴的正文。',chapter:0,paused:false,archived:false,sections:[{title:'全文',text:text.split(/\n\s*\n|\n/).filter(Boolean)}]});H.state.bookId=id;H.closeModal();H.state.sourceReturn=false;H.go('reader');H.toast('正文已导入本次会话，可以开始阅读。')},
+  'import-text':()=>{const title=$('import-title').value.trim(),text=$('import-text').value.trim();if(!title||!text){importError(!title?'请填写内容标题。':'请粘贴正文后再导入。');return}const id=crypto.randomUUID();if(H.slot('article')){showImport('text');return}H.state.books.push({id,title,type:'正文',kind:'article',status:'reading',goal:null,goalHistory:[],author:'你导入的内容',description:'来自粘贴的正文。',chapter:0,paused:false,archived:false,sections:[{title:'全文',text:text.split(/\n\s*\n|\n/).filter(Boolean)}]});H.state.bookId=id;H.state.sourceReturn=false;H.go('reader');goalModal(id,true)},
   highlight:()=>{const selection=window.getSelection(),key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;let node=selection?.anchorNode;if(node?.nodeType===Node.TEXT_NODE)node=node.parentElement;const p=node?.closest?.('[data-paragraph]');if(!p||!$('reader-text').contains(p)||!selection.toString().trim()){H.toast('请先用鼠标选中阅读正文中的一段文字。');return}const index=Number(p.dataset.paragraph),marks=H.state.marks[key]||[];H.state.marks[key]=marks.includes(index)?marks.filter(n=>n!==index):[...marks,index];selection.removeAllRanges();H.render();H.toast(marks.includes(index)?'已取消该段高亮。':'已高亮整段原文，作为考察侧重的参考。')},
   annotation:()=>{const key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;H.modal(modalHead('留下一点想法')+`<div class="form-field"><label for="note-text">本章批注</label><textarea id="note-text" placeholder="写下联系、疑问，或自己的理解。">${e(H.state.notes[key]||'')}</textarea></div><div class="form-actions">${b('保存批注','save-note','primary')}</div>`)},
   'save-note':()=>{const key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;H.state.notes[key]=$('note-text').value.trim();H.closeModal();H.render();H.toast('批注已保存在本次会话。')},
@@ -135,6 +167,8 @@
  document.addEventListener('dragover',event=>{if(event.target.closest('#dropzone')){event.preventDefault();$('dropzone').classList.add('dragging')}});
  document.addEventListener('dragleave',event=>{if(event.target.closest('#dropzone'))$('dropzone')?.classList.remove('dragging')});
  document.addEventListener('drop',event=>{if(event.target.closest('#dropzone')){event.preventDefault();$('dropzone').classList.remove('dragging');fileSelected(event.dataTransfer.files[0])}});
+ // 记住阅读目标面板的展开状态，同页重新渲染时不收起
+ document.addEventListener('toggle',event=>{if(event.target.classList?.contains('goal-panel'))H.state.goalOpen=event.target.open},true);
  dialog.addEventListener('cancel',event=>{event.preventDefault();H.closeModal()});
  $('queue-overlay').addEventListener('click',event=>{if(event.target===$('queue-overlay')){H.closePanel();$('queue-button').focus()}});
  $('queue-overlay').addEventListener('keydown',event=>{if(event.key!=='Tab')return;const nodes=[...$('queue-body').querySelectorAll('button')],first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}});
