@@ -31,7 +31,7 @@
 | `author` | 作者，可选 |
 | `kind` | `book` 或 `article`，决定占用哪个在读名额 |
 | `language` | 语言，可选，例如 `zh-CN` |
-| `source` | `{ type, url?, file? }`，`type` 为 `epub`、`pdf`、`web`、`wechat`、`x`、`text` 之一 |
+| `source` | `{ type, url?, file? }`，`type` 为 `epub`、`pdf`、`web`、`wechat`、`x`、`text`、`markdown`、`builtin`（内置内容，如首次使用引导）之一 |
 | `importedAt` | 导入时间，ISO 8601 |
 | `converter` | `{ name, version }`，产出文档的转换器，用于排查转换问题 |
 

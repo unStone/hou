@@ -14,6 +14,7 @@
 | `validate.ts` | `validate`：检查文档是否符合规范 |
 | `html.ts` | `htmlToBlocks`：把已提取的正文 HTML 转为内容块，兼容公众号的嵌套结构和 `data-src` 图片；`splitChapters` 按标题切分章节；`collectImages` 列出要下载的图片 |
 | `text.ts` | `textToDocument`：粘贴正文导入 |
+| `md.ts` | `markdownToBlocks`、`markdownToDocument`：Markdown 导入（首次使用引导、OCR 模型输出的 PDF 页面）；支持表格、公式、嵌套列表，夹带的 HTML 块交给调用方转换 |
 | `markdown.ts` | `toMarkdown`：导出 Markdown，可带块编号供模型回指原文 |
 
 ## 接下来
@@ -22,7 +23,7 @@
 2. 微信公众号：取 `#js_content`，下载图片并登记资源，清理公众号样式。
 3. EPUB：按目录拆章节，每章 HTML 交给 `htmlToBlocks`。
 4. X：通过 FxTwitter 接口拼接推文、串推和长文章。
-5. PDF：转换工具在技术方案阶段选定。
+5. PDF：每页渲染为图片，经 `@hou/llm` 调用 OCR 模型输出 Markdown，再交给 `markdownToBlocks`；合并时清理页眉页脚和页码。
 
 ## 开发
 

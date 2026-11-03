@@ -6,6 +6,8 @@ export { htmlToBlocks, splitChapters, collectImages, imageSource } from './html.
 export type { HtmlOptions } from './html.ts';
 export { textToDocument } from './text.ts';
 export type { TextInput } from './text.ts';
+export { markdownToBlocks, markdownToDocument } from './md.ts';
+export type { MarkdownInput, MarkdownOptions as MarkdownImportOptions } from './md.ts';
 export { toMarkdown } from './markdown.ts';
 export type { MarkdownOptions } from './markdown.ts';
 export { CONVERTER } from './version.ts';

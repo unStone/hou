@@ -4,7 +4,7 @@ export const FORMAT = 'hou-doc';
 export const FORMAT_VERSION = 1;
 
 export type Kind = 'book' | 'article';
-export type SourceType = 'epub' | 'pdf' | 'web' | 'wechat' | 'x' | 'text';
+export type SourceType = 'epub' | 'pdf' | 'web' | 'wechat' | 'x' | 'text' | 'markdown' | 'builtin';
 
 export interface HouDocument {
   format: typeof FORMAT;

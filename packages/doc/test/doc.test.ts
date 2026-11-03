@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseHTML } from 'linkedom';
-import { blockText, buildDocument, collectImages, createAnchor, htmlToBlocks, resolveAnchor, splitChapters, textToDocument, toMarkdown, validate, CONVERTER } from '../src/index.ts';
+import { blockText, buildDocument, collectImages, createAnchor, htmlToBlocks, markdownToBlocks, markdownToDocument, resolveAnchor, splitChapters, textToDocument, toMarkdown, validate, CONVERTER } from '../src/index.ts';
 import type { Asset, DocumentMeta, HouDocument } from '../src/index.ts';
 
 const meta = (extra: Partial<DocumentMeta> = {}): DocumentMeta => ({ title: '测试', kind: 'article', source: { type: 'web', url: 'https://example.com' }, importedAt: '2026-11-02T00:00:00.000Z', converter: CONVERTER, ...extra });
@@ -105,4 +105,72 @@ test('Markdown 导出：可带块编号，供模型回指原文', () => {
   const doc = textToDocument({ title: '留白', text: '一*二*' });
   assert.equal(toMarkdown(doc), '# 留白\n\n## 全文\n\n一\\*二\\*\n');
   assert.match(toMarkdown(doc, { ids: true }), /<!-- b1 -->\n一/);
+});
+
+test('Markdown：标题、段落、样式、列表（含嵌套）、引用、代码、表格、公式、分隔线', () => {
+  const blocks = markdownToBlocks([
+    '## 留白',
+    '',
+    '界面要像一张**宣纸**，*大面积*留白，见[规范](https://x.test)，',
+    '用 `tokens.css` 的变量。',
+    '',
+    '- 墨色分层',
+    '  1. 深',
+    '  2. 浅',
+    '- 没有投影',
+    '',
+    '> 先把书读厚，',
+    '>',
+    '> 再把书读薄。',
+    '',
+    '```css',
+    '.card { padding: 24px; }',
+    '```',
+    '',
+    '| 名称 | 取值 |',
+    '|---|---|',
+    '| paper | #F3EADB |',
+    '',
+    '$$',
+    'E = mc^2',
+    '$$',
+    '',
+    '面积是 $\\pi r^2$，价格 $5 和 $10。',
+    '',
+    '---',
+  ].join('\n'));
+  assert.deepEqual(blocks.map(b => b.type), ['heading', 'paragraph', 'list', 'quote', 'quote', 'code', 'table', 'math', 'paragraph', 'divider']);
+  const p = blocks[1];
+  assert.ok(p.type === 'paragraph');
+  assert.equal(blockText({ ...p, id: 'x' }), '界面要像一张宣纸，大面积留白，见规范，用 tokens.css 的变量。', '中文之间的软换行被去掉');
+  assert.deepEqual(p.content.find(c => c.type === 'text' && c.href), { type: 'text', text: '规范', href: 'https://x.test' });
+  const list = blocks[2];
+  assert.ok(list.type === 'list' && list.items.length === 4, '嵌套列表展平');
+  assert.deepEqual(blocks[7], { type: 'math', tex: 'E = mc^2' });
+  const prices = blocks[8];
+  assert.ok(prices.type === 'paragraph');
+  assert.deepEqual(prices.content.filter(c => c.type === 'math'), [{ type: 'math', tex: '\\pi r^2' }], '价格里的 $ 不当作公式');
+  const table = blocks[6];
+  assert.ok(table.type === 'table' && table.header && table.rows.length === 2);
+});
+
+test('Markdown：段落中的图片单独成块；HTML 块交给调用方转换', () => {
+  const blocks = markdownToBlocks('前面 ![示意](a.png "图 1") 后面\n\n<table><tr><td>1</td></tr></table>', {
+    resolveImage: () => 'img1',
+    html: html => [{ type: 'paragraph', content: [{ type: 'text', text: `HTML:${html.length}` }] }],
+  });
+  assert.deepEqual(blocks.map(b => b.type), ['paragraph', 'image', 'paragraph', 'paragraph']);
+  assert.deepEqual(blocks[1], { type: 'image', asset: 'img1', alt: '示意', caption: [{ type: 'text', text: '图 1' }] });
+});
+
+test('Markdown 文档：唯一的一级标题作为文档标题，二级标题切分章节', () => {
+  const doc = markdownToDocument({
+    markdown: '# 怎样用厚\n\n## 读厚，再读薄\n\n第一段。\n\n### 小节\n\n第二段。\n\n## 一本书，一篇文章\n\n第三段。',
+    meta: { kind: 'article', source: { type: 'builtin' }, importedAt: '2026-11-03T00:00:00.000Z' },
+  });
+  assert.deepEqual(validate(doc), []);
+  assert.equal(doc.meta.title, '怎样用厚');
+  assert.deepEqual(doc.chapters.map(c => [c.title, c.blocks.length]), [['读厚，再读薄', 3], ['一本书，一篇文章', 1]]);
+  const noTitle = () => markdownToDocument({ markdown: '只有正文', meta: { kind: 'article', source: { type: 'markdown' }, importedAt: '2026-11-03T00:00:00.000Z' } });
+  assert.throws(noTitle, /缺少标题/);
 });

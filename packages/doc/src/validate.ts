@@ -2,7 +2,7 @@ import { FORMAT, FORMAT_VERSION } from './types.ts';
 import type { Block, HouDocument, Inline } from './types.ts';
 
 const KINDS = ['book', 'article'];
-const SOURCES = ['epub', 'pdf', 'web', 'wechat', 'x', 'text'];
+const SOURCES = ['epub', 'pdf', 'web', 'wechat', 'x', 'text', 'markdown', 'builtin'];
 const MARKS = ['bold', 'italic', 'code'];
 
 /** 检查文档是否符合规范，返回全部问题；空数组表示通过 */

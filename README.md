@@ -6,7 +6,7 @@
 
 《厚》是一款正在设计中的 macOS 学习应用，名字取自华罗庚"先把书读厚，再把书读薄"。它以人为中心：在合适的时刻用钩子触发考察，由 LLM 判断理解程度、安排计划，帮助人把读过的书真正读厚，再提炼成自己的观点并输出。
 
-本仓库目前包含产品方案、品牌物料、一套可以直接用于 Open Design 与 AI 编码工具的设计系统，以及统一阅读格式的独立包。应用代码尚未开始。
+本仓库目前包含产品方案、品牌物料、一套可以直接用于 Open Design 与 AI 编码工具的设计系统，以及统一阅读格式与模型接入两个独立包。桌面应用（Electron）尚未开始，技术方案见 `docs/TECH.md`。
 
 ## 仓库内容
 
@@ -16,9 +16,11 @@
 | `tokens.css` | 与 DESIGN.md 一致的 CSS 变量，含浅色、深色与"减少动态效果"三套取值 |
 | `manifest.json`、`USAGE.md`、`assets/`、`fonts/` | Open Design 设计系统包 |
 | `docs/PRD.md` | 产品方案：目标、用户流程、功能设计、调研验证 |
+| `docs/TECH.md` | 技术方案初稿：Electron、本地数据、包划分、模型接入、里程碑 |
 | `brand/` | 品牌物料：图标、标志、横版组合、macOS 图标、网站图标、自媒体头像与封面、品牌规范板；总览页为 `brand/index.html`，说明见 `brand/brand-guidelines.md` |
-| `prototype/` | 用 Open Design 制作的可交互原型（静态示例数据，未接入模型）；`prototype/components.html` 为通用组件总览，按浅色、深色和桌面、手机分别渲染，可直接点击操作。需通过本地服务器打开：在仓库根目录运行 `python3 -m http.server 5179`，访问 `http://localhost:5179/prototype/index.html` 或 `http://localhost:5179/prototype/components.html` |
-| `packages/doc/` | 统一阅读格式：格式规范（`SPEC.md`）、校验、原文定位，以及网页、正文等来源的转换。独立于应用，可在桌面、浏览器和服务器运行；需要 Node 22.18 以上和 pnpm，在仓库根目录运行 `pnpm install` 后用 `pnpm test` 测试 |
+| `prototype/` | 用 Open Design 制作的可交互原型（静态示例数据，未接入模型）；`prototype/components.html` 为通用组件总览，按浅色、深色和桌面、手机分别渲染，可直接点击操作。需通过本地服务器打开：在仓库根目录运行 `python3 -m http.server 5179`，访问 `http://localhost:5179/prototype/index.html`（示例数据）、`http://localhost:5179/prototype/index.html?first`（首次使用：欢迎页与引导文章）或 `http://localhost:5179/prototype/components.html` |
+| `packages/llm/` | 模型接入：统一的调用接口，第一版支持 Anthropic（官方 SDK）与 OpenAI 兼容接口（含本机运行的模型和 OCR 小模型）；支持图片输入和 JSON 输出 |
+| `packages/doc/` | 统一阅读格式：格式规范（`SPEC.md`）、校验、原文定位，以及网页、正文、Markdown 等来源的转换。独立于应用，可在桌面、浏览器和服务器运行；需要 Node 22.18 以上和 pnpm，在仓库根目录运行 `pnpm install` 后用 `pnpm test` 测试 |
 | `scripts/` | 从图标母版重新生成标志与各类物料的脚本；`scripts/components/` 为通用组件总览的生成脚本 |
 
 ## 在 Open Design 中使用
