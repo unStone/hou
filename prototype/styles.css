@@ -92,3 +92,7 @@ dialog[open][data-leaving=true],.sheet-overlay[data-leaving=true]:not([hidden]),
 
 /* 深色模式的划词高亮：朱砂 24%，与浅色模式的 16% 区分度一致（见 DESIGN.md 与 tokens.css） */
 [data-theme=dark] .reader-text mark.hl{background:rgba(200,69,45,.24)}
+
+/* 把握程度、不知道、基本观点 */
+.confidence{margin-top:16px;gap:12px;flex-wrap:wrap}.confidence .tabs button:disabled{opacity:.45}.unknown-row{margin-top:8px}.unknown-row [aria-pressed=true]{color:var(--ink);background:var(--control)}.unknown-note{margin-top:12px}
+.essential-list{margin:16px 0 0;padding-left:24px;display:grid;gap:16px}.essential-list h3{font-size:17px}.essential-list .caption{margin-top:4px;line-height:1.7}

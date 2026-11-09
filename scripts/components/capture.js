@@ -42,6 +42,8 @@ async () => {
       for (const [name, label] of Object.entries(grabs)) if (type?.includes(name) && !cap[label]) grab(label, '.question');
       const options = [...document.querySelectorAll('[data-action=choose]')];
       if (options.length && !options.some(o => o.getAttribute('aria-checked') === 'true')) { options[0].click(); await sleep(150); }
+      const confs = [...document.querySelectorAll('[data-action=confidence]')];
+      if (confs.length && !confs.some(c => c.getAttribute('aria-checked') === 'true')) { confs[0].click(); await sleep(150); }
       const textarea = document.querySelector('#explanation');
       if (textarea && (!options.length || type?.includes('判断'))) textarea.value = '用自己的话写下的回答。';
       await click('[data-action=game-next]', 400);
@@ -129,7 +131,9 @@ async () => {
   grab('form-field-reason', '.form-field', el => el.querySelector('textarea')); grab('game-bottom-disabled', '.game-bottom');
   grab('question-choice', '.question');
   await click('[data-action=choose][data-index="1"]', 200);
-  grab('game-options-selected', '.game-options'); grab('game-bottom', '.game-bottom');
+  grab('game-options-selected', '.game-options'); grab('game-bottom-confidence', '.game-bottom');
+  await click('[data-action=confidence][data-index="1"]', 200);
+  grab('question-choice-confident', '.question'); grab('game-bottom', '.game-bottom');
   const check = $('.game-choice[aria-checked=true] .choice-check svg').outerHTML;
   const typeGrabs = { 判断并说明理由: 'question-judge', 用自己的话解释: 'question-explain', 情境应用: 'question-apply' };
   await answerAll(typeGrabs);
@@ -159,7 +163,7 @@ async () => {
   await click('[data-nav=records]', 400); grab('log-row', '.log-row');
   await click('[data-nav=library]', 300); await click('[data-action=filter]', 300, byText('归档'));
   await click('[data-action=book-menu][data-id=brand]', 300); grab('archive-menu', 'dialog[open]');
-  await click('dialog[open] [data-action=modal-review]', 400); grab('goal-summary', '.goal-summary');
+  await click('dialog[open] [data-action=modal-review]', 400); grab('goal-summary', '.goal-summary'); grab('essentials', '.essentials');
 
   // 设置
   await click('[data-nav=settings]', 400);
