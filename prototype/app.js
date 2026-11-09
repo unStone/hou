@@ -1,10 +1,10 @@
 (() => {
  const H=window.Hou,e=H.e,b=H.button,icon=H.icon;
- H.state={books:structuredClone(HouData.books),tasks:structuredClone(HouData.tasks),route:'today',bookId:'prd',filter:'active',completed:[],marks:{},notes:{},records:[],theme:'light',reduceMotion:false,sourceReturn:false,recordId:null,goalOpen:false,config:{url:'',model:'',shortcut:'⌘ ⇧ H',scheduled:false,time:'09:30',oldReview:true}};
+ H.state={books:structuredClone(HouData.books),tasks:structuredClone(HouData.tasks),route:'today',bookId:'prd',filter:'active',completed:[],marks:{},notes:{},records:[],theme:'light',reduceMotion:false,sourceReturn:false,recordId:null,goalOpen:false,skipped:[],asks:{},providers:[],config:{chat:null,ocr:null,shortcut:'⌘ ⇧ H',oldReview:true,autoStart:true}};
  const $=id=>document.getElementById(id);
  const content=$('content'),dialog=$('dialog');
  let timer=null,toastTimer=null,lastFocus=null,importMode='file',generation=0,renderedRoute=null;
- H.toast=message=>{clearTimeout(toastTimer);const toast=$('toast');enter(toast);$('toast-text').textContent=message;toast.hidden=false;toastTimer=setTimeout(()=>leave(toast,()=>{toast.hidden=true}),6000)};
+ H.toast=(message,action)=>{clearTimeout(toastTimer);const toast=$('toast'),button=$('toast-action');enter(toast);$('toast-text').textContent=message;button.hidden=!action;if(action){button.textContent=action.label;button.dataset.action=action.action;button.dataset.id=action.id||''}toast.hidden=false;toastTimer=setTimeout(()=>leave(toast,()=>{toast.hidden=true}),action?8000:6000)};
  H.render=(focus=false)=>{
   const s=H.state,views={today:H.today,library:H.library,reader:H.reader,extract:H.extract,game:H.game,result:H.result,settings:H.settings,records:H.records,log:H.log,schedule:H.schedule,'book-detail':H.bookDetail,review:H.review,welcome:H.welcome};
   if(!views[s.route])throw new Error(`无法显示页面：${s.route}`);
@@ -43,10 +43,15 @@
   const section=H.book(t.book).sections[t.section];
   let questions;
   if(t.id==='t3')questions=[{question:'用户刚读完一章，想先确认自己能不能认出正确的说法。哪种题型最合适？',choices:['情境选择','用自己的话解释','情境应用'],correct:0,explanation:'能识别、能理解这一层用情境选择，按标准答案在本地判分。'},{type:'judge',statement:'取消小游戏后，所有题目都必须由模型判分。',correct:1,explanation:'不对。情境选择和判断题的对错在本地按标准答案判分，只有理由、解释和应用需要模型按评分细则判。',rubric:['判断为不对','理由指出选择题、判断题对错可以本地判分']}];
-  else if(t.guide)questions=structuredClone(HouData.guide.questions[t.section]??HouData.guide.questions[0]);
+  else if(t.demo)questions=structuredClone(t.questions);
   else if(!t.custom&&((t.book==='prd'&&t.section===0)||(t.book==='design'&&t.section===0)||t.book==='brand'))questions=structuredClone(HouData.questions[t.book]);
   else questions=[{question:'回忆刚读过的内容，哪一项与原文一致？',choices:[section.text[0],'原文没有提出任何观点。','这份内容没有可供理解的信息。'],correct:0,explanation:'本地示例将所选表述与导入原文直接核对，只检测识别。'},{type:'explain',prompt:`用自己的话解释「${t.title}」说的是什么。`,reference:t.description,rubric:['意思与原文一致','用自己的话，不照抄原文']}];
   questions=questions.map(q=>({type:'choice',...q}));
+  if(t.draft&&Date.now()-t.draft.at<DAY){
+   const d=t.draft,step=d.questions.findIndex((q,i)=>H.auto(q)?d.answers[i]===undefined:!String(d.answers[i]??'').trim());
+   H.state.game={taskId:id,trigger,phase:'playing',step:step<0?d.questions.length-1:step,questions:d.questions,answers:d.answers,notes:d.notes,operations:d.operations,readonly:false};H.go('game');H.toast('接着上次没做完的那一题。');return;
+  }
+  t.draft=null;
   H.state.game={taskId:id,trigger,phase:'loading',step:0,questions,answers:[],notes:[],operations:[],readonly:false};H.go('game');
   const token=++generation;clearTimeout(timer);timer=setTimeout(()=>{if(token!==generation||H.state.route!=='game')return;H.state.game.phase='playing';H.render(true)},1000);
  };
@@ -111,6 +116,8 @@
   if(H.state.route!=='reader'||event.target.closest?.('#sel-toolbar,.ask-panel,dialog'))return;
   const found=readSelection();
   if(found){H.state.selTool={mode:'new',segments:found.segments,quote:found.quote,...toolbarAt(found.rect)};getSelection().removeAllRanges();H.render();fitToolbar();return}
+  const asked=event.target.closest?.('mark.asked');
+  if(asked&&getSelection().isCollapsed){openAsk(asked.dataset.ask);return}
   const el=event.target.closest?.('mark.hl');
   if(el){const {key,m}=findMark(el.dataset.mark);H.state.selTool={mode:'mark',id:m.id,note:m.note,segments:[{p:m.p,start:m.start,end:m.end}],quote:markQuote(key,m),...toolbarAt(el.getBoundingClientRect())};H.render();fitToolbar();return}
   if(H.state.selTool){H.state.selTool=null;H.render()}
@@ -139,8 +146,6 @@
   return {title,sections};
  };
  const openGuide=async()=>{
-  const held=H.slot('article');
-  if(held){H.toast(`文章的在读位置被《${held.title.replace(/^《|》$/g,'')}》占用，读完或放弃后才能打开引导。`);return}
   let guide;
   try{const response=await fetch('guide.md');if(!response.ok)throw new Error(`HTTP ${response.status}`);guide=parseGuide(await response.text())}catch(error){H.toast(`无法读取引导：${error.message}。请通过本地服务器打开原型。`);return}
   const id=`guide-${H.state.books.filter(x=>x.guide).length+1}`;
@@ -148,32 +153,82 @@
   H.state.bookId=id;H.state.firstRun=false;H.state.sourceReturn=false;H.go('reader');
  };
  const resetToFirstRun=()=>{
-  Object.assign(H.state,{books:[],tasks:[],records:[],marks:{},notes:{},completed:[],ask:null,selTool:null,extraction:null,game:null,firstRun:true,bookId:null});
-  Object.assign(H.state.config,{url:'',model:''});H.secret='';
+  Object.assign(H.state,{books:[],tasks:[],records:[],marks:{},notes:{},completed:[],skipped:[],asks:{},ask:null,selTool:null,extraction:null,game:null,firstRun:true,bookId:null});
+  H.state.providers=[];Object.assign(H.state.config,{chat:null,ocr:null});
   H.go('welcome');
  };
+ const providerModal=type=>{
+  const anthropic=type==='anthropic';
+  const html=modalHead('添加模型服务')+`<div class="tabs" role="tablist" aria-label="服务类型">${Object.entries(H.providerTypes).map(([v,label])=>b(label,'provider-type','',`data-value="${v}" role="tab" aria-selected="${type===v}" tabindex="${type===v?0:-1}"`)).join('')}</div><p class="caption" style="margin-top:12px">${anthropic?'使用 Anthropic 官方接口。':'大多数云端服务，以及本机运行的模型（Ollama、vLLM、LM Studio 等）都支持这个协议。'}</p><div class="form-field"><label for="provider-name">名称</label><input id="provider-name" value="${anthropic?'Claude':'本机 Ollama'}" autocomplete="off"></div><div class="form-field"><label for="provider-url">服务地址</label><input id="provider-url" type="url" value="${anthropic?'https://api.anthropic.com':'http://localhost:11434/v1'}" autocomplete="off"></div><div class="form-cols"><div class="form-field"><label for="provider-model">模型名</label><input id="provider-model" placeholder="${anthropic?'例如 claude-opus-5-5':'例如 glm-ocr'}" autocomplete="off"></div><div class="form-field"><label for="provider-key">密钥${anthropic?'':'（本机服务可留空）'}</label><input id="provider-key" type="password" autocomplete="new-password" placeholder="本次会话内暂存"></div></div><p id="provider-error" class="field-error" role="alert" hidden></p><div class="form-actions">${b('取消','close-modal','text-button')}${b('添加','save-provider','primary',`data-value="${type}"`)}</div>`;
+  if(dialog.open){$('dialog-body').innerHTML=html;dialog.querySelector('[role="tab"][aria-selected="true"]').focus()}else H.modal(html);
+ };
+ // 引导只在讲"标记读完"的那一章生成一次示例考察，其余章节标记读完不提取
+ const GUIDE_DEMO=()=>({points:[HouData.guide.points[1][0],HouData.guide.points[4][0],HouData.guide.points[5][0]],questions:[HouData.guide.questions[1][0],HouData.guide.questions[4][0],HouData.guide.questions[5][1]]});
+ const guideDemoChapter=book=>book.sections.findIndex(s=>s.title.includes('标记读完'));
+ // 来源标注：本地示例按段落判断，知识点所在段落有高亮或问过 AI 时标注
+ const sourcesOf=(book,chapter,paragraph)=>{const key=`${book.id}:${chapter}`,out=[];if((H.state.marks[key]||[]).some(m=>m.p===paragraph))out.push('你高亮过');if((H.state.asks[key]||[]).some(a=>a.segments.some(g=>g.p===paragraph)))out.push('你问过');return out};
+ // 粘贴正文导入：导入即在读，然后填写阅读目标
+ const importText=(title,text)=>{const id=crypto.randomUUID();H.state.books.push({id,title,type:'正文',kind:'article',status:'reading',goal:null,goalHistory:[],author:'你导入的内容',description:'来自粘贴的正文。',chapter:0,paused:false,archived:false,sections:[{title:'全文',text:text.split(/\n\s*\n|\n/).filter(Boolean)}]});H.state.bookId=id;H.state.sourceReturn=false;H.go('reader');goalModal(id,true)};
+ // 重新打开一段问答：问过的文字和本章划线列表都可以点开
+ const openAsk=id=>{const entry=Object.values(H.state.asks).flat().find(a=>a.id===id);if(!entry)throw new Error('找不到问答：'+id);H.state.ask=entry;H.state.selTool=null;H.render();requestAnimationFrame(()=>$('ask-input')?.focus())};
  const extract=()=>{
   const book=H.book(H.state.bookId),section=book.sections[book.chapter],key=`${book.id}:${book.chapter}`;
-  H.state.extraction={book:book.id,section:book.chapter,loading:true,points:[]};H.go('extract');const token=++generation;
-  clearTimeout(timer);timer=setTimeout(()=>{if(token!==generation||H.state.route!=='extract')return;const existing=H.state.tasks.filter(t=>t.book===book.id&&t.section===book.chapter);const builtin=book.guide&&HouData.guide.points[book.chapter];const points=builtin&&!existing.length?builtin.map(p=>({title:p.title,text:p.text,removed:false})):existing.length?existing.map(t=>({title:t.title,text:t.description,removed:false,relevance:t.relevance,relevanceReason:t.relevanceReason,manual:t.relevanceManual})):section.text.slice(0,3).map((p,i)=>({title:section.text.length===1?section.title:`${section.title} · 要点 ${i+1}`,text:p,removed:false}));if(book.goal){const order={high:0,mid:1,low:2};points.forEach(p=>{if(!p.relevance)Object.assign(p,relevanceOf(book.goal,p.title,p.text))});points.sort((a,b)=>order[a.relevance]-order[b.relevance])}H.state.extraction.points=points;H.state.extraction.loading=false;H.render(true)},900);
+  if(book.guide&&book.chapter!==guideDemoChapter(book)){if(!H.state.completed.includes(key))H.state.completed.push(key);H.render();H.toast('引导不逐章提取知识点。读到「标记读完，留下知识点」那一章，会生成一次示例考察。');return}
+  const already=H.state.completed.includes(key)&&!book.guide;
+  H.state.extraction={book:book.id,section:book.chapter,loading:true,points:[],more:already};H.go('extract');const token=++generation;
+  clearTimeout(timer);timer=setTimeout(()=>{
+   if(token!==generation||H.state.route!=='extract')return;
+   const existing=H.state.tasks.filter(t=>t.book===book.id&&t.section===book.chapter);
+   let points;
+   if(already){points=existing.filter(t=>t.status==='excluded').map(t=>({title:t.title,text:t.description,removed:true,sources:t.sources}));H.state.extraction.kept=existing.length-points.length}
+   else if(book.guide)points=GUIDE_DEMO().points.map(p=>({title:p.title,text:p.text,removed:false}));
+   else if(existing.length)points=existing.map(t=>({title:t.title,text:t.description,removed:false,relevance:t.relevance,relevanceReason:t.relevanceReason,manual:t.relevanceManual,sources:t.sources}));
+   else points=section.text.slice(0,3).map((p,i)=>({title:section.text.length===1?section.title:`${section.title} · 要点 ${i+1}`,text:p,removed:false,sources:sourcesOf(book,book.chapter,i)}));
+   if(book.goal&&!already){const order={high:0,mid:1,low:2};points.forEach(p=>{if(!p.relevance)Object.assign(p,relevanceOf(book.goal,p.title,p.text))});points.sort((a,b)=>order[a.relevance]-order[b.relevance])}
+   H.state.extraction.points=points;H.state.extraction.loading=false;H.render(true);
+  },900);
  };
  const confirmExtraction=()=>{
   const x=H.state.extraction,kept=x.points.filter(p=>!p.removed),key=`${x.book}:${x.section}`;
   if(!H.state.completed.includes(key))H.state.completed.push(key);
-  x.points.forEach(p=>{const existing=H.state.tasks.find(t=>t.book===x.book&&t.section===x.section&&t.title===p.title);const rel=p.relevance?{relevance:p.relevance,relevanceReason:p.relevanceReason,relevanceManual:!!p.manual}:{};if(existing)Object.assign(existing,rel);if(existing&&p.removed)existing.status='excluded';else if(existing&&existing.status==='excluded')existing.status='pending';else if(!existing&&!p.removed)H.state.tasks.push({id:crypto.randomUUID(),book:x.book,section:x.section,title:p.title,description:p.text,level:'理解',minutes:3,status:'pending',mastery:1,reason:p.relevance==='high'?'与阅读目标高度相关，优先安排首次考察。':'章节读完后，首次从基础识别开始考察。',custom:true,...(H.book(x.book).guide?{guide:true}:{}),...rel})});
+  if(H.book(x.book).guide){const demo=GUIDE_DEMO();if(!H.state.tasks.some(t=>t.book===x.book&&t.demo))H.state.tasks.push({id:crypto.randomUUID(),book:x.book,section:x.section,title:'示例考察：怎样用厚',description:'用三道题体验一次考察，题目是写好的，不需要模型。',level:'理解',minutes:3,status:'pending',mastery:1,reason:'引导自带的示例考察。',guide:true,demo:true,questions:demo.questions});H.go('today');H.toast('示例考察已加入待完成。做完后，引导会自动归档。');return}
+  x.points.forEach(p=>{const existing=H.state.tasks.find(t=>t.book===x.book&&t.section===x.section&&t.title===p.title);const rel=p.relevance?{relevance:p.relevance,relevanceReason:p.relevanceReason,relevanceManual:!!p.manual}:{};if(existing)Object.assign(existing,rel);if(existing&&p.removed)existing.status='excluded';else if(existing&&existing.status==='excluded')existing.status='pending';else if(!existing&&!p.removed)H.state.tasks.push({id:crypto.randomUUID(),book:x.book,section:x.section,title:p.title,description:p.text,level:'理解',minutes:3,status:'pending',mastery:1,reason:p.relevance==='high'?'与阅读目标高度相关，优先安排首次考察。':'章节读完后，首次从基础识别开始考察。',custom:true,sources:p.sources||[],...rel})});
   H.go('today');H.toast(kept.length?`已保留 ${kept.length} 个知识点。首次示例考察已加入待完成。`:'未保留知识点，本章节已标记读完。');
  };
+ const DAY=24*60*60*1000;
+ // 固定间隔：档位不降且没有误解时按 1、3、7、21 天拉长；出现误解或降档回到 1 天
+ const INTERVALS=[1,3,7,21];
+ const schedule=(t,before,level,mistake)=>{
+  const reset=mistake||level<before;t.step=reset?0:Math.min((t.step??-1)+1,INTERVALS.length-1);const days=INTERVALS[t.step];
+  return {next:days===1?'明天 · 20:00':`${days} 天后 · 20:00`,planReason:reset?'出现误解或档位下降，间隔回到 1 天，尽快换个角度再考。':days===1?'档位没有下降。从 1 天的间隔开始，之后逐步拉长到 3、7、21 天。':`档位没有下降，间隔拉长到 ${days} 天。`};
+ };
+ // 本地示例判断：选择题、判断题按标准答案；主观题写满 15 个字算要点到位。真实判断由模型综合本次与历次作答给出
+ const TYPE_LEVEL={choice:2,judge:2,explain:3,apply:4};
+ const judge=(g,before)=>{
+  const subjective=g.questions.map((q,i)=>H.auto(q)?null:String(g.answers[i]).trim().length>=15);
+  const passed=g.questions.map((q,i)=>H.auto(q)?g.answers[i]===q.correct:subjective[i]);
+  const mistake=passed.includes(false),reached=Math.max(1,...g.questions.map((q,i)=>passed[i]?TYPE_LEVEL[q.type]:1));
+  const level=mistake?Math.max(1,Math.min(reached,before)):Math.max(reached,before);
+  return {level,mistake,subjective,reason:mistake?'（示例）有题目没有答到要点，掌握程度暂不提升。':'（示例）各题都答到了要点，掌握程度按最高的题型确认。'};
+ };
+ const afterJudge=t=>{if(!t.demo)return;const guide=H.book(t.book);if(guide.archived)return;Object.assign(guide,{status:'done',archived:true,endedAt:today()});H.toast('示例考察完成，引导已归档。现在可以导入你自己的书和文章了。')};
  const finishGame=()=>{
   const g=H.state.game,t=task(g.taskId);if(g.questions.some((q,i)=>H.auto(q)?g.answers[i]===undefined:!String(g.answers[i]??'').trim()))throw new Error('作答不完整，不能提交考察');
-  // 本地只判选择题、判断题的对错；解释题、应用题等模型按评分细则判分，原型里标为待判分
-  const auto=g.questions.filter(H.auto).length,correct=g.questions.filter((q,i)=>H.auto(q)&&g.answers[i]===q.correct).length,pending=g.questions.length-auto;
-  const level=auto?(correct===auto?2:1):t.mastery,next=level===2?'明天 · 09:30':'今天 · 20:00';
-  addRecord({taskId:t.id,trigger:g.trigger,status:'complete',questions:structuredClone(g.questions),answers:[...g.answers],notes:[...g.notes],operations:[...g.operations,{action:'submit',at:new Date().toISOString()}],level,next,pending});
-  t.mastery=level;t.status='scheduled';t.when=next;t.reason=pending?'依据本地可判的题目先安排；主观题判分后再调整。':'依据本地示例选择结果，先巩固识别，再进入新的情境。';H.go('result');
+  const r=addRecord({taskId:t.id,trigger:g.trigger,status:'complete',questions:structuredClone(g.questions),answers:[...g.answers],notes:[...g.notes],operations:[...g.operations,{action:'submit',at:new Date().toISOString()}],judging:true});
+  t.status='judging';t.draft=null;H.go('result');
+  setTimeout(()=>{
+   const before=t.mastery,res=judge(g,before),plan=schedule(t,before,res.level,res.mistake);
+   Object.assign(r,{judging:false,level:res.level,reason:res.reason,subjective:res.subjective},plan);
+   t.mastery=res.level;t.status='scheduled';t.when=plan.next;t.reason=plan.planReason;
+   afterJudge(t);
+   if(H.state.recordId===r.id&&H.state.route==='result')H.render();
+  },1500);
  };
+ // 异议：写下理由，模型结合理由复核一次，以复核结果为准；原判断、理由和复核结果都记录
  const dispute=()=>{
   const r=H.state.records.find(x=>x.id===H.state.recordId);
-  H.modal(modalHead(r.override?'查看结论记录':'说说你的不同理解')+`<p class="muted">可以指出评分依据的问题。原示例结果会保留。</p><div class="form-field"><label for="dispute-reason">异议理由</label><textarea id="dispute-reason" placeholder="你认为哪一处判断需要重新考虑？" ${r.override?'readonly':''}>${e(r.dispute||'')}</textarea></div><p id="dispute-error" class="field-error" role="alert" hidden></p>${r.override?`<div class="notice">原示例结论：${HouData.levels[r.level-1]}<br>你的结论：${HouData.levels[r.override-1]}</div>`:r.reviewed?`<div class="review-note">示例复核保留原结论。此处未运行模型；你仍可以自己的结论为准。</div><div class="segmented-label">你的结论</div><div class="level-picker" role="group" aria-label="你的掌握程度">${HouData.levels.map((v,i)=>b(e(v),'pick-level','',`data-index="${i+1}" aria-pressed="${(H.overrideLevel||r.level)===i+1}"`)).join('')}</div><div class="form-actions">${b('采用我的结论','override-result','primary')}</div>`:`<div class="notice">真实复核需要模型服务。这里可以体验一次示例复核及采用自己结论的流程。</div><div class="form-actions">${b('查看示例复核','review-dispute','primary')}</div>`}`);
+  if(r.dispute){H.modal(modalHead('复核记录')+`<div class="review-trail"><div><span class="caption">原判断</span><p>${HouData.levels[r.level-1]} · ${e(r.reason)}</p></div><div><span class="caption">你的理由</span><p>${e(r.dispute)}</p></div><div><span class="caption">复核结果（以此为准）</span><p>${r.reviewing?'正在复核':`${HouData.levels[r.reviewLevel-1]} · ${e(r.reviewReason)}`}</p></div></div>`);return}
+  H.modal(modalHead('对结果有异议')+`<p class="muted">写下你的理由。模型会结合理由复核一次，以复核结果为准；原判断、你的理由和复核结果都会记录。</p><div class="form-field"><label for="dispute-reason">你的理由</label><textarea id="dispute-reason" rows="4" placeholder="例如：我理解这个概念，只是用词不严谨。"></textarea></div><p id="dispute-error" class="field-error" role="alert" hidden></p><div class="form-actions">${b('取消','close-modal','text-button')}${b('提交复核','submit-dispute','primary')}</div>`);
  };
  const actions={
   today:()=>H.go('today'),library:()=>H.go('library'),settings:()=>H.go('settings'),records:()=>H.go('records'),schedule:()=>H.go('schedule'),reader:()=>H.go('reader'),
@@ -186,16 +241,25 @@
   'sel-note':()=>{const t=H.state.selTool;H.modal(modalHead(t.mode==='mark'&&t.note?'批注':'写批注')+`<blockquote class="ask-quote">${e(t.quote)}</blockquote><div class="form-field"><label for="mark-note">你的想法</label><textarea id="mark-note" rows="3" placeholder="写下联系、疑问，或自己的理解。">${e(t.note||'')}</textarea><span class="caption">批注会挂在这段文字的高亮上。</span></div><div class="form-actions">${b('保存批注','save-mark-note','primary')}</div>`)},
   'save-mark-note':()=>{const t=H.state.selTool,text=$('mark-note').value.trim();if(t.mode==='mark')findMark(t.id).m.note=text;else addMarks(chapterKey(),t.segments,text);H.state.selTool=null;H.closeModal();H.render();H.toast(text?'批注已保存，这段文字已高亮。':'已高亮，没有写批注。')},
   'sel-copy':()=>{const t=H.state.selTool;H.state.selTool=null;H.render();(navigator.clipboard?.writeText(t.quote)??Promise.reject()).then(()=>H.toast('已复制。'),()=>H.toast('浏览器不允许复制，请手动复制。'))},
-  'sel-ask':()=>{const t=H.state.selTool;H.state.ask={bookId:H.state.bookId,key:chapterKey(),segments:t.segments,quote:t.quote,messages:[],loading:false,draft:''};H.state.selTool=null;H.render();requestAnimationFrame(()=>$('ask-input')?.focus())},
+  'sel-ask':()=>{const t=H.state.selTool,key=chapterKey(),entry={id:crypto.randomUUID(),bookId:H.state.bookId,key,segments:t.segments,quote:t.quote,messages:[],loading:false,draft:''};(H.state.asks[key]||=[]).push(entry);H.state.ask=entry;H.state.selTool=null;H.render();requestAnimationFrame(()=>$('ask-input')?.focus())},
+  'open-ask':el=>openAsk(el.dataset.id),
   'ask-preset':el=>askSend(el.dataset.value),'ask-send':()=>askSend($('ask-input').value.trim()),'ask-close':()=>{H.state.ask=null;H.render()},
   'ask-save':el=>{const a=H.state.ask,i=Number(el.dataset.index);addMarks(a.key,a.segments,`问：${a.messages[i-1].text}\n答：${a.messages[i].text}`);a.messages[i].saved=true;H.render();H.toast('回答已存为批注。')},
   'goto-mark':el=>{const node=content.querySelector(`mark[data-mark="${CSS.escape(el.dataset.id)}"]`);if(!node)return;node.scrollIntoView({block:'center',behavior:H.state.reduceMotion?'auto':'smooth'});node.classList.add('flash');setTimeout(()=>node.classList.remove('flash'),1200)},
   'book-detail':el=>{H.state.bookId=el.dataset.id;H.go('book-detail')},
-  'book-menu':el=>{const book=H.book(el.dataset.id);H.modal(modalHead(book.title)+`<div class="od-stack gap-16">${b('查看章节与掌握程度','modal-book-detail','secondary',`data-id="${e(book.id)}"`)}${b(book.paused?'恢复考察':'暂停考察','pause-book','secondary',`data-id="${e(book.id)}"`)}${b(book.goal?'修改阅读目标':'写下阅读目标','modal-goal','secondary',`data-id="${e(book.id)}"`)}${b('放弃这'+(book.kind==='book'?'本':'篇'),'abandon','text-button',`data-id="${e(book.id)}"`)}</div>`)},'modal-goal':el=>goalModal(el.dataset.id,false),
+  'book-menu':el=>{const book=H.book(el.dataset.id);if(book.archived){const held=H.slot(book.kind);H.modal(modalHead(book.title)+`<div class="od-stack gap-16">${book.status==='done'?b('查看回顾','modal-review','secondary',`data-id="${e(book.id)}"`):''}${b('查看章节与掌握程度','modal-book-detail','secondary',`data-id="${e(book.id)}"`)}${b('重新开始读','restart-book','secondary',`data-id="${e(book.id)}" ${held?'disabled':''}`)}${held?`<p class="caption">${H.kinds[book.kind].name}的在读名额被占用，读完或放弃那一${book.kind==='book'?'本':'篇'}后才能重新开始。</p>`:''}${b('彻底删除','delete-confirm','text-button',`data-id="${e(book.id)}"`)}</div>`);return}H.modal(modalHead(book.title)+`<div class="od-stack gap-16">${b('查看章节与掌握程度','modal-book-detail','secondary',`data-id="${e(book.id)}"`)}${b(book.paused?'恢复考察':'暂停考察','pause-book','secondary',`data-id="${e(book.id)}"`)}${b(book.goal?'修改阅读目标':'写下阅读目标','modal-goal','secondary',`data-id="${e(book.id)}"`)}${b('放弃这'+(book.kind==='book'?'本':'篇'),'abandon','text-button',`data-id="${e(book.id)}"`)}</div>`)},'modal-goal':el=>goalModal(el.dataset.id,false),
   'modal-book-detail':el=>{H.closeModal();actions['book-detail'](el)},
   'pause-book':el=>{const book=H.book(el.dataset.id);book.paused=!book.paused;if(dialog.open)H.closeModal();H.render();H.toast(book.paused?'考察已暂停。阅读与历史记录会保留。':'已恢复这份内容的考察安排。')},
   abandon:el=>{const book=H.book(el.dataset.id),unit=book.kind==='book'?'本':'篇';H.modal(modalHead(`放弃这${unit}？`)+`<p class="archive-name">${e(book.title)}</p><p class="muted">放弃后归档，标记为“未读完”，空出${H.kinds[book.kind].name}的在读名额。归档后不能再继续读，只能回看；已提取的知识点按“旧书复习”设置处理。</p><div class="form-field"><label for="abandon-reason">为什么不读了</label><textarea id="abandon-reason" rows="3" placeholder="例如：内容和我的目标关系不大。"></textarea><span class="caption">必填。理由会一直留在归档里。</span></div><p id="abandon-error" class="field-error" role="alert" hidden></p><div class="form-actions">${b('继续读','close-modal','text-button')}${b('确认放弃','abandon-confirm','primary',`data-id="${e(book.id)}"`)}</div>`)},
-  'abandon-confirm':el=>{const reason=$('abandon-reason').value.trim();if(!reason){$('abandon-error').textContent='请写下放弃的理由。';$('abandon-error').hidden=false;$('abandon-reason').focus();return}const book=H.book(el.dataset.id);book.status='abandoned';book.archived=true;book.abandonReason=reason;book.endedAt=today();H.closeModal();if(['reader','extract'].includes(H.state.route)&&H.state.bookId===book.id)H.go('library');else H.render();H.toast(`已放弃并归档，${H.kinds[book.kind].name}的在读名额空出来了。`)},
+  'abandon-confirm':el=>{const reason=$('abandon-reason').value.trim();if(!reason){$('abandon-error').textContent='请写下放弃的理由。';$('abandon-error').hidden=false;$('abandon-reason').focus();return}const book=H.book(el.dataset.id);book.status='abandoned';book.archived=true;book.abandonReason=reason;book.endedAt=today();H.closeModal();if(['reader','extract'].includes(H.state.route)&&H.state.bookId===book.id)H.go('library');else H.render();H.toast(`已放弃并归档，${H.kinds[book.kind].name}的在读名额空出来了。`,{label:'撤销',action:'undo-abandon',id:book.id})},
+  'undo-abandon':el=>{const book=H.book(el.dataset.id);if(!book?.archived)return;if(H.slot(book.kind)){H.toast(`${H.kinds[book.kind].name}的在读名额已被占用，不能撤销。`);return}Object.assign(book,{status:'reading',archived:false,abandonReason:null,endedAt:null});clearTimeout(toastTimer);leave($('toast'),()=>{$('toast').hidden=true});H.render();H.toast('已撤销放弃，回到在读。')},
+  'modal-review':el=>{H.closeModal();actions.review(el)},
+  'restart-book':el=>{const book=H.book(el.dataset.id);if(H.slot(book.kind))return;Object.assign(book,{status:'reading',archived:false,abandonReason:null,endedAt:null});H.closeModal();H.state.filter='active';H.render();H.toast('已重新开始读，阅读位置、已读章节和知识点都保留。读完后会重新回顾。')},
+  'delete-confirm':el=>{const book=H.book(el.dataset.id);$('dialog-body').innerHTML=modalHead('彻底删除？')+`<p class="archive-name">${e(book.title)}</p><p class="muted">会删除原文件、图片、高亮、问答、知识点和考察记录；运行记录里只保留"已删除的读物"占位。删除后不能恢复。</p><div class="form-actions">${b('取消','close-modal','text-button')}${b('彻底删除','delete-book','primary',`data-id="${e(book.id)}"`)}</div>`},
+  'delete-book':el=>{const book=H.book(el.dataset.id),ids=new Set(H.state.tasks.filter(t=>t.book===book.id).map(t=>t.id));H.state.books=H.state.books.filter(x=>x!==book);H.state.tasks=H.state.tasks.filter(t=>!ids.has(t.id));for(const store of [H.state.marks,H.state.notes,H.state.asks])for(const key of Object.keys(store))if(key.startsWith(book.id+':'))delete store[key];H.state.completed=H.state.completed.filter(k=>!k.startsWith(book.id+':'));H.state.skipped=H.state.skipped.filter(k=>!k.startsWith(book.id+':'));H.state.records.forEach(r=>{if(ids.has(r.taskId))r.deleted=true});if(H.state.bookId===book.id)H.state.bookId=null;H.closeModal();H.render();H.toast('已彻底删除。')},
+  'skip-chapter':()=>{const book=H.book(H.state.bookId),key=chapterKey();const on=!H.state.skipped.includes(key);H.state.skipped=on?[...H.state.skipped,key]:H.state.skipped.filter(k=>k!==key);H.render();H.toast(on?'本章已跳过，不提取、不考察。':'已取消跳过。')},
+  'finish-guide':el=>{const book=H.book(el.dataset.id);Object.assign(book,{status:'done',archived:true,endedAt:today()});H.go('today');H.toast('引导已读完并归档。现在可以导入你自己的书和文章了。')},
+  'import-anyway':()=>{const p=H.state.pendingImport;H.state.pendingImport=null;H.closeModal();importText(p.title,p.text)},
   'finish-confirm':el=>{const book=H.book(el.dataset.id);H.modal(modalHead('全书读完？')+`<p class="archive-name">${e(book.title)}</p><p class="muted">读完后归档，空出${H.kinds[book.kind].name}的在读名额，并对照阅读目标做一次回顾。</p><div class="form-actions">${b('再看看','close-modal','text-button')}${b('读完，去回顾','finish-book','primary',`data-id="${e(book.id)}"`)}</div>`)},
   'finish-book':el=>{const book=H.book(el.dataset.id);book.status='done';book.archived=true;book.endedAt=today();H.state.bookId=book.id;H.closeModal();H.go('review')},
   review:el=>{H.state.bookId=el.dataset.id;H.go('review')},
@@ -208,7 +272,7 @@
   'toggle-old-review':()=>{H.state.config.oldReview=!H.state.config.oldReview;H.render();H.toast(H.state.config.oldReview?'归档内容的知识点会继续按计划出题。':'归档内容不再出题，掌握程度和记录都保留。')},
   import:()=>showImport(H.slot('book')&&!H.slot('article')?'text':'file'),'import-kind':el=>showImport(el.dataset.value==='book'?'file':'text'),'quota-read':el=>{H.closeModal();actions.read(el)},'import-tab':el=>showImport(el.dataset.value),
   'import-web':()=>{const input=$('import-url'),value=input.value.trim();let url;try{url=new URL(value)}catch{importError('请填写完整的网页链接，例如 https://example.com/article。');return}if(!['https:','http:'].includes(url.protocol)){importError('网页链接必须使用 http 或 https。');return}importError('当前原型没有接入网页正文提取，无法抓取这个链接。请切换到“正文”，粘贴文章内容后导入。')},
-  'import-text':()=>{const title=$('import-title').value.trim(),text=$('import-text').value.trim();if(!title||!text){importError(!title?'请填写内容标题。':'请粘贴正文后再导入。');return}const id=crypto.randomUUID();if(H.slot('article')){showImport('text');return}H.state.books.push({id,title,type:'正文',kind:'article',status:'reading',goal:null,goalHistory:[],author:'你导入的内容',description:'来自粘贴的正文。',chapter:0,paused:false,archived:false,sections:[{title:'全文',text:text.split(/\n\s*\n|\n/).filter(Boolean)}]});H.state.bookId=id;H.state.sourceReturn=false;H.go('reader');goalModal(id,true)},
+  'import-text':()=>{const title=$('import-title').value.trim(),text=$('import-text').value.trim();if(!title||!text){importError(!title?'请填写内容标题。':'请粘贴正文后再导入。');return}if(H.slot('article')){showImport('text');return}const same=H.state.books.find(x=>x.title===title&&!x.guide);if(same){H.state.pendingImport={title,text};$('dialog-body').innerHTML=modalHead('书架里已经有这篇')+`<p class="archive-name">${e(same.title)}</p><p class="muted">${same.archived?`已归档 · ${H.ended(same)}`:'正在读'}。可以打开已有的那一份，也可以仍然导入为新的一份。</p><div class="form-actions">${b('仍然导入','import-anyway','text-button')}${b('打开已有的','quota-read','primary',`data-id="${e(same.id)}"`)}</div>`;return}importText(title,text)},
   annotation:()=>{const key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;H.modal(modalHead('留下一点想法')+`<div class="form-field"><label for="note-text">本章批注</label><textarea id="note-text" placeholder="写下联系、疑问，或自己的理解。">${e(H.state.notes[key]||'')}</textarea></div><div class="form-actions">${b('保存批注','save-note','primary')}</div>`)},
   'save-note':()=>{const key=`${H.state.bookId}:${H.book(H.state.bookId).chapter}`;H.state.notes[key]=$('note-text').value.trim();H.closeModal();H.render();H.toast('批注已保存在本次会话。')},
   'extract-start':extract,'toggle-point':el=>{const p=H.state.extraction.points[Number(el.dataset.index)];p.removed=!p.removed;H.render()},'confirm-extraction':confirmExtraction,
@@ -217,22 +281,30 @@
   choose:el=>{const g=H.state.game;if(g.readonly)return;saveGameNote();g.answers[g.step]=Number(el.dataset.index);g.operations.push({action:'choose',step:g.step,value:Number(el.dataset.index),at:new Date().toISOString()});H.render();content.querySelector(`[data-action="choose"][data-index="${el.dataset.index}"]`)?.focus()},
   'game-next':()=>{const g=H.state.game,q=g.questions[g.step];saveGameNote();if(!g.readonly){const missing=q.type==='judge'&&!String(g.notes[g.step]??'').trim()?'请写一句理由。':!H.auto(q)&&!String(g.answers[g.step]??'').trim()?'请先写下你的回答。':'';g.error=missing;if(missing){H.render();$('explanation')?.focus();return}}if(g.step<g.questions.length-1){g.step++;H.render(true)}else if(g.readonly)H.go('log');else finishGame()},
   'game-prev':()=>{saveGameNote();H.state.game.error='';H.state.game.step--;H.render(true)},'retry-game':()=>H.start(H.state.game.taskId,H.state.game.trigger),
-  'exit-game':()=>{const g=H.state.game;clearTimeout(timer);generation++;if(g.readonly){H.go('log');return}saveGameNote();addRecord({taskId:g.taskId,trigger:g.trigger,status:'interrupted',operations:g.operations,answers:g.answers,notes:g.notes});task(g.taskId).status='pending';H.go('today');H.toast('考察已回到待完成列表，本次不计入掌握程度。')},
+  'exit-game':()=>{const g=H.state.game;clearTimeout(timer);generation++;if(g.readonly){H.go('log');return}saveGameNote();if(g.phase!=='playing'){task(g.taskId).status='pending';H.go('today');return}addRecord({taskId:g.taskId,trigger:g.trigger,status:'interrupted',operations:g.operations,answers:g.answers,notes:g.notes});const t=task(g.taskId);t.status='pending';t.draft={questions:g.questions,answers:[...g.answers],notes:[...g.notes],operations:[...g.operations],at:Date.now()};H.go('today');H.toast('考察已回到待完成列表。题目和作答已保存，24 小时内打开会接着做。')},
   source:el=>{const t=task(el.dataset.id);H.state.bookId=t.book;H.book(t.book).chapter=t.section;H.state.sourceReturn=true;H.go('reader')},'return-result':()=>{H.state.sourceReturn=false;H.go('result')},
-  dispute,'review-dispute':()=>{const reason=$('dispute-reason').value.trim();if(!reason){$('dispute-error').textContent='请说明你不同意的具体依据。';$('dispute-error').hidden=false;return}const r=H.state.records.find(x=>x.id===H.state.recordId);r.dispute=reason;r.reviewed=true;H.overrideLevel=r.level;H.closeModal();dispute()},
-  'pick-level':el=>{H.overrideLevel=Number(el.dataset.index);dialog.querySelectorAll('[data-action="pick-level"]').forEach(n=>n.setAttribute('aria-pressed',n===el?'true':'false'))},
-  'override-result':()=>{const r=H.state.records.find(x=>x.id===H.state.recordId),reason=$('dispute-reason').value.trim();if(!reason){$('dispute-error').textContent='请保留具体的异议理由。';$('dispute-error').hidden=false;return}r.dispute=reason;r.override=H.overrideLevel||r.level;r.next=r.override<=2?'今天 · 20:00':'明天 · 09:30';const t=task(r.taskId);t.mastery=r.override;t.when=r.next;t.reason='按你确认的掌握程度调整示例安排。';H.closeModal();H.render();H.toast('已采用你的结论。原结果与复核记录一并保留。')},
+  dispute,'submit-dispute':()=>{const reason=$('dispute-reason').value.trim();if(!reason){$('dispute-error').textContent='请写下你不同意的理由。';$('dispute-error').hidden=false;return}const r=H.state.records.find(x=>x.id===H.state.recordId),t=task(r.taskId);r.dispute=reason;r.reviewing=true;H.closeModal();H.render();setTimeout(()=>{const up=reason.length>=10;r.reviewing=false;r.reviewLevel=Math.min(5,r.level+(up?1:0));r.reviewReason=up?'（示例）结合你的理由，你的回答抓住了要点，只是表述不严谨，调高一档。':'（示例）理由不足以改变判断，维持原档位。';if(up){Object.assign(r,schedule(t,r.level,r.reviewLevel,false));t.mastery=r.reviewLevel;t.when=r.next;t.reason=r.planReason}if(H.state.recordId===r.id&&H.state.route==='result')H.render();H.toast('复核完成，以复核结果为准。')},1500)},
   log:el=>{H.state.recordId=el.dataset.id;H.go('log')},'record-result':el=>{H.state.recordId=el.dataset.id;H.go('result')},
   replay:el=>{const r=H.state.records.find(x=>x.id===el.dataset.id);H.state.game={taskId:r.taskId,phase:'playing',step:0,readonly:true,questions:r.questions,answers:r.answers,notes:r.notes};H.go('game')},
   theme:el=>{H.state.theme=el.dataset.value;H.render()},'toggle-theme':()=>{H.state.theme=H.state.theme==='light'?'dark':'light';H.render()},'reduce-motion':()=>{H.state.reduceMotion=!H.state.reduceMotion;H.render()},
-  'save-config':()=>{const url=$('model-url').value.trim(),model=$('model-name').value.trim(),secret=$('model-key').value.trim(),error=$('config-error');let parsed;try{parsed=new URL(url)}catch{error.textContent='请填写完整的模型服务地址。';error.hidden=false;return}if(!['http:','https:'].includes(parsed.protocol)||!model||!secret){error.textContent='请使用 http 或 https 地址，并填写模型名称与密钥。';error.hidden=false;return}H.state.config.url=url;H.state.config.model=model;H.secret=secret;error.hidden=true;if(H.state.configFromWelcome&&H.state.firstRun){H.state.configFromWelcome=false;H.go('welcome');H.toast('模型服务已配置。接下来开始读引导。');return}H.toast('配置已暂存到本次会话。原型不会发起模型请求。')},
   shortcut:()=>H.modal(modalHead('主动领取快捷键')+`<div class="form-field"><label for="shortcut-input">按下新的组合键</label><input id="shortcut-input" readonly value="${e(H.state.config.shortcut)}"><span class="caption">至少包含 Command 或 Control 加一个字母。本页面内生效。</span></div><div class="form-actions">${b('保存快捷键','save-shortcut','primary')}</div>`),
   'save-shortcut':()=>{const value=$('shortcut-input').value;if(!/(⌘|Ctrl)/.test(value)){H.toast('请使用 Command 或 Control 加一个字母。');return}H.state.config.shortcut=value;H.closeModal();H.render();H.toast('快捷键已更新，仅在本页面生效。')},
-  'toggle-schedule':()=>{H.state.config.scheduled=!H.state.config.scheduled;H.render()},
-  notification:()=>H.modal(modalHead('有一份理解，值得再看看。')+`<p class="muted">${H.pending().length?'一项考察已准备好，约需几分钟。':'当前没有到期的考察，也可以主动领取。'}</p><p class="footnote">这是通知样式预览，不会发送系统通知。</p><div class="form-actions">${b('稍后再做','close-modal','text-button')}${b('领取考察','notification-start','primary')}</div>`),'notification-start':()=>{H.closeModal();claim()}
+  'toggle-autostart':()=>{H.state.config.autoStart=!H.state.config.autoStart;H.render();H.toast(H.state.config.autoStart?'开机后会自动在菜单栏启动。':'已关闭开机自启；关闭窗口后仍会留在菜单栏。')},
+  'add-provider':()=>providerModal('anthropic'),'provider-type':el=>providerModal(el.dataset.value),
+  'save-provider':el=>{
+   const type=el.dataset.value,name=$('provider-name').value.trim(),url=$('provider-url').value.trim(),model=$('provider-model').value.trim(),key=$('provider-key').value.trim(),error=$('provider-error');
+   let parsed;try{parsed=new URL(url)}catch{error.textContent='请填写完整的服务地址。';error.hidden=false;return}
+   if(!['http:','https:'].includes(parsed.protocol)||!model||!name){error.textContent='请填写名称、模型名，并使用 http 或 https 地址。';error.hidden=false;return}
+   if(type==='anthropic'&&!key){error.textContent='Anthropic 服务需要密钥。';error.hidden=false;return}
+   const p={id:crypto.randomUUID(),name,type,url,model,tested:false};H.state.providers.push(p);if(!H.state.config.chat)H.state.config.chat=p.id;H.closeModal();
+   if(H.state.configFromWelcome&&H.state.firstRun){H.state.configFromWelcome=false;H.go('welcome');H.toast('模型服务已添加，并指定为对话服务。接下来开始读引导。');return}
+   H.render();H.toast(H.state.config.chat===p.id?'已添加，并指定为对话服务。':'已添加。可以在下方为对话或 OCR 指定它。')},
+  'test-provider':el=>{const p=H.provider(el.dataset.id);p.testing=true;H.render();setTimeout(()=>{p.testing=false;p.tested=true;H.render();H.toast(`${p.name}：模拟连接成功（原型不发送请求）。`)},800)},
+  'remove-provider':el=>{const p=H.provider(el.dataset.id);H.state.providers=H.state.providers.filter(x=>x!==p);for(const k of ['chat','ocr'])if(H.state.config[k]===p.id)H.state.config[k]=null;H.render();H.toast(`已删除 ${p.name}。`)},
+  notification:()=>H.modal(modalHead('有一份理解，值得再看看。')+`<p class="muted">${H.pending().length?`有 ${H.pending().length} 次考察待完成，做一次只要几分钟。`:'当前没有到期的考察，也可以主动领取。'}</p><p class="footnote">这是通知样式预览，不会发送系统通知。</p><div class="form-actions">${b('稍后再做','close-modal','text-button')}${b('领取考察','notification-start','primary')}</div>`),'notification-start':()=>{H.closeModal();claim()}
  };
  document.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(!el||el.disabled)return;const handler=actions[el.dataset.action];if(!handler)throw new Error('未实现的操作：'+el.dataset.action);handler(el)});
- document.addEventListener('change',event=>{if(event.target.id==='file-input')fileSelected(event.target.files[0]);if(event.target.id==='schedule-time')H.state.config.time=event.target.value});
+ document.addEventListener('change',event=>{if(event.target.id==='file-input')fileSelected(event.target.files[0]);if(event.target.id==='use-chat'||event.target.id==='use-ocr'){H.state.config[event.target.id==='use-chat'?'chat':'ocr']=event.target.value||null;H.render()}});
  document.addEventListener('focusout',event=>{if(event.target.id==='import-title'&&!event.target.value.trim()){importError('请填写内容标题。')}if(event.target.id==='import-text'&&!event.target.value.trim()){importError('请粘贴正文后再导入。')}});
  document.addEventListener('keydown',event=>{
   if(event.target.id==='shortcut-input'){event.preventDefault();if((event.metaKey||event.ctrlKey)&&/^[a-z]$/i.test(event.key))event.target.value=[event.metaKey?'⌘':'Ctrl',event.shiftKey?'⇧':'',event.altKey?'⌥':'',event.key.toUpperCase()].filter(Boolean).join(' ');return}

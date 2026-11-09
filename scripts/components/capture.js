@@ -77,7 +77,7 @@ async () => {
   await click('[data-action=book-menu][data-id=design]', 300);
   await click('dialog[open] [data-action=abandon]', 300); grab('abandon-dialog', 'dialog[open]');
   const abandonReason = $('#abandon-reason'); abandonReason.value = '内容已经在设计规范里看过。';
-  await click('dialog[open] [data-action=abandon-confirm]', 400);
+  await click('dialog[open] [data-action=abandon-confirm]', 400); grab('toast-undo', '.toast');
   await click('[data-nav=today]', 300); grab('slot-card-empty', '.slot-card.empty-slot');
 
   // 文章名额空出后，网页与正文表单可用
@@ -91,6 +91,9 @@ async () => {
   // 阅读器：阅读目标、划词功能栏、划词高亮、问 AI
   await click('[data-action=continue-reading]', 400);
   grab('toc', '.toc'); grab('reader-tools', '.reader-tools'); grab('reader-bottom', '.reader-bottom'); grab('goal-panel', '.goal-panel');
+  await click('[data-action=chapter][data-index="4"]', 200); await click('[data-action=skip-chapter]', 200);
+  grab('toc-skipped', '.toc'); grab('reader-bottom-skipped', '.reader-bottom');
+  await click('[data-action=chapter][data-index="0"]', 300);
   await click('.goal-panel [data-action=goal]', 300); grab('goal-dialog', 'dialog[open]');
   await click('[data-action=close-modal]', 300);
   await selectText(1, 0, 12); grabToolbar('sel-toolbar');
@@ -131,34 +134,41 @@ async () => {
   const typeGrabs = { 判断并说明理由: 'question-judge', 用自己的话解释: 'question-explain', 情境应用: 'question-apply' };
   await answerAll(typeGrabs);
 
-  // 反馈与异议
+  // 反馈与异议：提交后先显示对错，判断完成后补上掌握程度
+  grab('result-card-judging', '.result-card');
+  await sleep(1800);
   grab('result-card', '.result-card'); grab('result-details', '.result-details');
-  grab('result-details-pending', '.result-details', byText('待模型判分'));
   await click('[data-action=dispute]', 300); grab('dispute-dialog', 'dialog[open]');
   const reason = $('dialog[open] textarea');
   reason.value = '第二题的情境里，计划也会决定考察的时机';
   reason.dispatchEvent(new Event('input', { bubbles: true }));
-  await click('dialog[open] [data-action=review-dispute]', 1800); grab('dispute-review', 'dialog[open]');
+  await click('dialog[open] [data-action=submit-dispute]', 1900);
+  await click('[data-action=dispute]', 300); grab('dispute-review', 'dialog[open]');
   await click('dialog[open] [data-action=close-modal]', 300);
 
   // 其余题型：依次做几道示例考察（品牌规范含判断题，视觉规范含应用题，产品方案含解释题），直到四种题型都采集到
   for (const id of ['t5', 't2', 't1']) {
     if (Object.values(typeGrabs).every(label => cap[label])) break;
-    Hou.start(id); await sleep(1500); await answerAll(typeGrabs);
+    Hou.start(id); await sleep(1500); await answerAll(typeGrabs); await sleep(1800);
   }
   for (const label of Object.values(typeGrabs)) if (!cap[label]) throw new Error(`采集失败：没有遇到 ${label}`);
+  // 最后一次考察含主观题，结果页上有示例判断
+  grab('result-details-pending', '.result-details', byText('示例判断'));
 
   // 运行记录、回顾页
   await click('[data-nav=records]', 400); grab('log-row', '.log-row');
   await click('[data-nav=library]', 300); await click('[data-action=filter]', 300, byText('归档'));
-  await click('[data-action=review][data-id=brand]', 400); grab('goal-summary', '.goal-summary');
+  await click('[data-action=book-menu][data-id=brand]', 300); grab('archive-menu', 'dialog[open]');
+  await click('dialog[open] [data-action=modal-review]', 400); grab('goal-summary', '.goal-summary');
 
   // 设置
   await click('[data-nav=settings]', 400);
   grab('settings-section', '.settings-section'); grab('settings-row-switch', '.settings-row', el => el.querySelector('.switch'));
-  await click('[data-action=save-config]', 300);
-  grab('settings-section-error', '.settings-section', el => el.querySelector('.field-error'));
-  grab('toast', '.toast');
+  await click('[data-action=add-provider]', 400); grab('provider-dialog', 'dialog[open]');
+  await click('dialog[open] [data-action=save-provider]', 200); grab('provider-dialog-error', 'dialog[open]');
+  $('#provider-model').value = 'claude-opus-5-5'; $('#provider-key').value = 'test-key';
+  await click('dialog[open] [data-action=save-provider]', 400);
+  grab('settings-section-filled', '.settings-section'); grab('toast', '.toast');
 
   // 今天：安排理由
   await click('[data-nav=today]', 400);

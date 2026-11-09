@@ -332,20 +332,20 @@
       "items": [
         {
           "id": "C21",
-          "name": "设置区块",
-          "usage": "设置页的一个分组，含输入框与按钮",
-          "interaction": "输入、聚焦",
+          "name": "模型服务设置",
+          "usage": "设置页的模型服务：可以添加多个，再为对话和 OCR 各指定一个",
+          "interaction": "测试连接、删除、选择用途",
           "variants": [
             {
-              "label": "默认",
+              "label": "还没有服务",
               "keys": [
                 "settings-section"
               ]
             },
             {
-              "label": "校验失败",
+              "label": "已添加一个服务",
               "keys": [
-                "settings-section-error"
+                "settings-section-filled"
               ]
             }
           ]
@@ -374,6 +374,27 @@
               "label": "默认",
               "keys": [
                 "form-field-reason"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "C53",
+          "name": "添加模型服务对话框",
+          "usage": "选择 Anthropic 或 OpenAI 兼容，填写地址、模型名与密钥",
+          "interaction": "切换类型标签；输入；点击 × 或按 Esc 淡出，可重新显示",
+          "scene": "dialog",
+          "variants": [
+            {
+              "label": "默认",
+              "keys": [
+                "provider-dialog"
+              ]
+            },
+            {
+              "label": "校验失败",
+              "keys": [
+                "provider-dialog-error"
               ]
             }
           ]
@@ -491,7 +512,13 @@
           "interaction": "无",
           "variants": [
             {
-              "label": "默认",
+              "label": "正在判断",
+              "keys": [
+                "result-card-judging"
+              ]
+            },
+            {
+              "label": "判断完成",
               "keys": [
                 "result-card"
               ]
@@ -511,7 +538,7 @@
               ]
             },
             {
-              "label": "主观题（待模型判分）",
+              "label": "主观题（示例判断）",
               "keys": [
                 "result-details-pending"
               ]
@@ -584,6 +611,12 @@
               "keys": [
                 "toast"
               ]
+            },
+            {
+              "label": "带撤销",
+              "keys": [
+                "toast-undo"
+              ]
             }
           ]
         },
@@ -632,8 +665,8 @@
         {
           "id": "C36",
           "name": "异议对话框",
-          "usage": "对判分结果提出异议",
-          "interaction": "输入理由；选择档位；点击 × 或按 Esc 淡出，可重新显示",
+          "usage": "对判断结果提出异议：模型结合理由复核一次，以复核结果为准",
+          "interaction": "输入理由；点击 × 或按 Esc 淡出，可重新显示",
           "scene": "dialog",
           "variants": [
             {
@@ -643,7 +676,7 @@
               ]
             },
             {
-              "label": "示例复核结果",
+              "label": "复核记录",
               "keys": [
                 "dispute-review"
               ]
@@ -747,6 +780,21 @@
               ]
             }
           ]
+        },
+        {
+          "id": "C54",
+          "name": "归档菜单",
+          "usage": "归档读物的操作：回顾、掌握程度、重新开始读、彻底删除",
+          "interaction": "点击 × 或按 Esc 淡出，可重新显示",
+          "scene": "dialog",
+          "variants": [
+            {
+              "label": "读完的书",
+              "keys": [
+                "archive-menu"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -756,13 +804,19 @@
         {
           "id": "C38",
           "name": "章节目录",
-          "usage": "阅读器左侧",
+          "usage": "阅读器左侧，显示每章的已读、跳过状态",
           "interaction": "点击切换当前章节",
           "variants": [
             {
               "label": "默认",
               "keys": [
                 "toc"
+              ]
+            },
+            {
+              "label": "含跳过的章节",
+              "keys": [
+                "toc-skipped"
               ]
             }
           ]
@@ -784,13 +838,19 @@
         {
           "id": "C40",
           "name": "阅读底栏",
-          "usage": "章节进度与标记读完",
+          "usage": "章节进度、跳过本章与标记读完",
           "interaction": "悬停、按下",
           "variants": [
             {
               "label": "默认",
               "keys": [
                 "reader-bottom"
+              ]
+            },
+            {
+              "label": "本章已跳过",
+              "keys": [
+                "reader-bottom-skipped"
               ]
             }
           ]

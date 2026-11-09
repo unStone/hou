@@ -80,3 +80,12 @@ dialog[open][data-leaving=true],.sheet-overlay[data-leaving=true]:not([hidden]),
 /* 首次使用欢迎页 */
 .welcome{max-width:640px;margin:0 auto;padding:72px 32px 64px;animation:appear var(--duration) ease-out}.welcome-mark{display:block;width:72px;height:auto;border-radius:16px;margin-bottom:32px}.welcome h1{margin:12px 0 16px}.welcome-lead{color:var(--muted);font-size:16px;line-height:1.9;max-width:34em}.welcome-steps{list-style:none;margin:40px 0 0;padding:0;display:grid;gap:16px}.welcome-step{display:flex;gap:20px;align-items:flex-start;padding:24px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.welcome-step h2{font-size:18px;margin-bottom:6px}.welcome-step .muted{font-size:14px;line-height:1.8;margin-bottom:16px}.welcome-step.done{background:var(--paper)}.welcome-step.done .muted{margin-bottom:0}.step-no{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;border:1px solid var(--muted);border-radius:50%;font:14px var(--serif)}.welcome-step.done .step-no{background:var(--ink);border-color:var(--ink);color:var(--paper)}.welcome-step.done .step-no .od-icon{--od-icon-size:14px}
 @media(max-width:767px){.welcome{padding:40px 20px 96px}.welcome-step{padding:20px;gap:16px}.welcome-step .primary{width:100%}}
+
+/* 同步规则：模型服务、章节状态、问过的文字、复核记录、轻提示操作 */
+.select{min-height:40px;min-width:180px;padding:8px 12px;border:1px solid var(--muted);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px}.provider-row .od-row{gap:8px;flex:none}.provider-empty{font-size:14px;margin:16px 0}
+.toc button .toc-state{flex:none;font-size:11px;color:var(--muted);padding:0 6px;border:1px solid var(--line);border-radius:4px;line-height:1.6}.toc button .toc-state.skipped{border-style:dashed}
+.reader-text mark.asked{background:none;border-bottom:1px dotted var(--muted);cursor:pointer}.asked-item{border-left-color:var(--muted)}
+.judging{display:grid;gap:12px;margin-top:8px}.review-trail{display:grid;gap:16px}.review-trail p{margin-top:4px;line-height:1.8}
+.guide-row{margin-top:12px;padding:12px 16px;border:1px dashed var(--line);border-radius:8px;font-size:14px}.deferred-note{padding:12px 8px}
+.toast .toast-action{color:var(--paper);font-weight:500;text-decoration:underline;text-underline-offset:4px;padding:4px 8px}
+@media(max-width:767px){.provider-row{flex-wrap:wrap}.select{min-width:140px}}
