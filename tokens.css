@@ -34,7 +34,12 @@
   --success: #4e6b58;
   --warn: #8a5f27;
   --danger: #b83f29;
+  --danger-on: #f3eadb;
   --seal: #c8452d;
+  /* 划词标记：叠在纸面上的半透明朱砂，文字颜色不变 */
+  --mark-highlight: rgba(184, 63, 41, 0.16);
+  /* 焦点框：2px 实线，颜色同正文 */
+  --focus: var(--fg);
   --font-display: "Source Han Serif SC", "Source Han Serif CN", "Songti SC", serif;
   --font-body: "PingFang SC", -apple-system, system-ui, sans-serif;
   --font-reading: "Source Han Serif SC", "Source Han Serif CN", "Songti SC", serif;
@@ -70,6 +75,7 @@
   --elev-ring: 0 0 0 1px var(--border);
   --elev-raised: 0 0 0 1px var(--border-soft);
   --focus-ring: 0 0 0 3px rgba(51, 52, 53, 0.18);
+  /* 使用时乘以 --motion-scale：calc(var(--motion-base) * var(--motion-scale)) */
   --motion-fast: 160ms;
   --motion-base: 240ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -92,11 +98,28 @@
   --accent-on: #1e2022;
   --accent-hover: #c9c2b7;
   --focus-ring: 0 0 0 3px rgba(237, 229, 214, 0.22);
+  /* 深色背景上的状态色：色相同浅色模式，提亮到对比度 ≥ 4.5 */
+  --danger: #ce8572;
+  --danger-on: #1e2022;
+  --success: #8e9c8a;
+  --warn: #b1936b;
+  --mark-highlight: rgba(200, 69, 45, 0.24);
+}
+
+/* 减少动态效果：系统设置或应用内开关都只改这一个系数，所有时长随之归零；位移同时取消，只留透明度 */
+:root {
+  --motion-scale: 1;
+  --motion-rise: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion-fast: 1ms;
-    --motion-base: 1ms;
+    --motion-scale: 0;
+    --motion-rise: 0px;
   }
+}
+
+[data-reduce-motion="true"] {
+  --motion-scale: 0;
+  --motion-rise: 0px;
 }
